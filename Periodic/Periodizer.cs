@@ -26,21 +26,29 @@ namespace Periodic
 
             if (ts.Any())
             {
-                result.Add(ts.First());
-                var lastTvq = ts.Last();
-                var t0 = lastTvq.Time;
-                var lastSecond = new DateTime(t0.Year, 12, 31, 23, 59, 59);
+                var firstTvq = ts.First();
+                var tFirst = firstTvq.Time;
+                var lastSecond = new DateTime(tFirst.Year, 12, 31, 23, 59, 59);
                 Tvq newTvq;
                 if (ts.Count == 1)
                 {
-                    newTvq = new Tvq(lastSecond, lastTvq.V, Quality.Interpolated);
+                    var firstSecond = new DateTime(tFirst.Year, 01, 01, 0, 0, 0);
+                    newTvq = new Tvq(firstSecond, firstTvq.V, Quality.Interpolated);
+                    result.Add(newTvq);
+                }
+                result.AddRange(ts);
+                
+                var iLast = ts.Count - 1;
+                var last = ts[iLast];
+
+                if (ts.Count < 2)
+                {
+                    newTvq = new Tvq(lastSecond, last.V, Quality.Interpolated);
+                    result.Add(newTvq);
                 }
                 else
-                {
-                    result.Add(ts[1]);
-                    int j = 1;
-                    var nextLast = ts[j - 1];
-                    var last = ts[j];
+                { 
+                    var nextLast = ts[iLast - 1];
 
                     var dx = last.Time - nextLast.Time;
                     var dy = last.V - nextLast.V;
@@ -50,8 +58,8 @@ namespace Periodic
                     var extrapolatedValue = k * x + last.V;
 
                     newTvq = new Tvq(lastSecond, extrapolatedValue, Quality.Interpolated);
+                    result.Add(newTvq);
                 }
-                result.Add(newTvq);
             }
 
             return result;
