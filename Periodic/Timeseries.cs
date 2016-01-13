@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Periodic
 {
-    public class Timeseries<T> : List<Tvq<T>>
+    public class Timeseries : List<Tvq>
     {
         //public IList<Tvq<T>> m_Tvq = new List<Tvq<T>>();
 
-        public new Timeseries<T> Add(Tvq<T> tvq)
+        public new Timeseries Add(Tvq tvq)
         {
             base.Add(tvq);
             return this;

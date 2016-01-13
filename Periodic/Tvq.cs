@@ -2,15 +2,15 @@
 
 namespace Periodic
 {
-    public class Tvq<T>
+    public class Tvq
     {
         public DateTime Time { get; private set; }
 
-        public T V { get; private set; }
+        public double V { get; private set; }
 
         public Quality Q { get; private set; }
 
-        public Tvq(DateTime t, T v, Quality q)
+        public Tvq(DateTime t, double v, Quality q)
         {
             Time = t;
             V = v;
