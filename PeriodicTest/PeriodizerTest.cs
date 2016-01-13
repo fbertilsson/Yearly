@@ -49,7 +49,7 @@ namespace PeriodicTest
         }
 
         [Fact]
-        public void InsertPoints_WhenOnePointAtStart_InsertsStartpointAtFirstSecond()
+        public void InsertPoints_WhenOnePoint_InsertsStartpointAtFirstSecond()
         {
             var ts = new Timeseries {m_Tvqs.Tvq20150601};
             var result = new Periodizer().InsertPoints(ts, Interval.Year);
@@ -62,9 +62,20 @@ namespace PeriodicTest
         {
             var ts = new Timeseries {m_Tvqs.Tvq20150101};
             var result = new Periodizer().InsertPoints(ts, Interval.Year);
+            Assert.Equal(2, result.Count);
             var tvq = result.Last();
             Assert.Equal(m_Tvqs.Tvq20150101.V, tvq.V);
             Assert.Equal(Quality.Interpolated, tvq.Q);
+        }
+
+        [Fact]
+        public void InsertPoints_WhenOnePointAtEnd_DoesNotInsertEndpoint()
+        {
+            var ts = new Timeseries { m_Tvqs.Tvq20151231 };
+            var result = new Periodizer().InsertPoints(ts, Interval.Year);
+            Assert.Equal(2, result.Count);
+            var tvq = result.Last();
+            Assert.Same(m_Tvqs.Tvq20151231, tvq);
         }
 
         [Fact]
