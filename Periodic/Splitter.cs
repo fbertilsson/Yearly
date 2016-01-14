@@ -25,8 +25,7 @@ namespace Periodic
             {
                 if (previous == null)
                 {
-                    currentTs = new Timeseries();
-                    currentTs.Add(tvq);
+                    currentTs = new Timeseries {tvq};
                     result.Add(currentTs);
                 }
                 else
