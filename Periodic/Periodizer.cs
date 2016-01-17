@@ -3,11 +3,6 @@ using System.Linq;
 
 namespace Periodic
 {
-    public enum Interval
-    {
-        Year,
-    }
-
     public class Periodizer
     {
         /// <summary>
@@ -17,7 +12,7 @@ namespace Periodic
         /// </summary>
         /// <param name="ts"></param>
         /// <param name="intervalLength"></param>
-        /// <returns></returns>
+        /// <returns>A new timeseries that has values at the start and end of the interval</returns>
         public Timeseries InsertPoints(Timeseries ts, Interval intervalLength)
         {
             if (ReferenceEquals(ts, null)) throw new ArgumentException("ts");
