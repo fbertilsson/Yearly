@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Periodic
 {
@@ -10,6 +11,13 @@ namespace Periodic
         {
             base.Add(tvq);
             return this;
+        }
+
+        public override string ToString()
+        {
+            return this.Aggregate(
+                string.Empty,
+                (s, x) => s + $"\r\n{x.Time}\t{x.V}\t{x.Q}");
         }
     }
 }
