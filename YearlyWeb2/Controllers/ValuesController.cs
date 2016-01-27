@@ -28,35 +28,10 @@ namespace YearlyWeb2.Controllers
         public string Get(string id)
         {
             //var id = 12345;
-            var ts = ParseTimeseries(id);
+            var ts = TsParser.ParseTimeseries(id);             // Problem: A tab in the request is not accepted by the browser
             var periodizer = new Periodizer();
             return periodizer.InsertPoints(ts, Interval.Year).ToString();
             //return $"the value of {id} is {id * id}";
-        }
-
-        private static Timeseries ParseTimeseries(string tabSeparatedTimeseries)
-        {
-            var reader = new StringReader(tabSeparatedTimeseries);
-            var result = new Timeseries();
-
-            var line = reader.ReadLine();
-            while (line != null)
-            {
-                var tvq = ParseLine(line);
-                result.Add(tvq);
-                line = reader.ReadLine();
-            }
-
-            return result;
-        }
-
-        private static Tvq ParseLine(string line)
-        {
-            // Problem: A tab in the request is not accepted by the browser
-            var parts = line.Split('\t');
-            var t = DateTime.Parse(parts[0]);
-            var v = int.Parse(parts[1]);
-            return new Tvq(t, v, Quality.Ok);
         }
 
         // POST api/values

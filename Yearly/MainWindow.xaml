@@ -5,8 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Yearly"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
+        Title="Periodizer" Height="350" Width="525">
+    <StackPanel
+        Orientation="Horizontal">
+        <StackPanel>
+            <TextBlock>Copy some rows of dates and values and paste here:</TextBlock>
+            <TextBox
+                MinLines="20"
+                AcceptsReturn="True"
+                AcceptsTab="True"
+                x:Name="tbSource"/>
+        </StackPanel>
         
-    </Grid>
+        <Button
+            Height="90"
+            Margin="10"
+            Padding="6"
+            Content="Periodize" Click="ButtonClick"/>
+        
+        <StackPanel>
+            <TextBlock>The periodized result:</TextBlock>
+            <TextBox
+                x:Name="tbResult"
+                MinLines="20"/>
+        </StackPanel>
+    </StackPanel>
 </Window>
