@@ -13,8 +13,12 @@ namespace Periodic
             var line = reader.ReadLine();
             while (line != null)
             {
-                var tvq = ParseLine(line);
-                result.Add(tvq);
+                var trimmedLine = line.Trim();
+                if (!string.IsNullOrEmpty(trimmedLine))
+                {
+                    var tvq = ParseLine(trimmedLine);
+                    result.Add(tvq);
+                }
                 line = reader.ReadLine();
             }
 
