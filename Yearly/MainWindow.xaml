@@ -5,29 +5,63 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Yearly"
         mc:Ignorable="d"
-        Title="Periodizer" Height="350" Width="525">
-    <StackPanel
-        Orientation="Horizontal">
-        <StackPanel>
-            <TextBlock>Copy some rows of dates and values and paste here:</TextBlock>
+        Title="Periodizer" Height="350" Width="700"
+        Loaded="OnWindowLoaded">
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style TargetType="TextBox">
+                <Setter Property="Margin" Value="0,5"/>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid
+        Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid
+            Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock
+                Grid.Row="0">Copy some rows of dates and values and paste here:</TextBlock>
             <TextBox
-                MinLines="20"
+                Grid.Row="1"
+                MinLines="15"
                 AcceptsReturn="True"
                 AcceptsTab="True"
+                TabIndex="1"
                 x:Name="tbSource"/>
-        </StackPanel>
+        </Grid>
         
         <Button
-            Height="90"
-            Margin="10"
+            Grid.Column="1"
+            Height="130"
+            Margin="10,4"
             Padding="6"
-            Content="Periodize" Click="ButtonClick"/>
-        
-        <StackPanel>
-            <TextBlock>The periodized result:</TextBlock>
+            TabIndex="20"
+            VerticalAlignment="Top"
+            IsDefault="True"
+            Content="Periodize" 
+            Click="ButtonClick"/>
+
+        <Grid
+            Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0">The periodized result:</TextBlock>
             <TextBox
                 x:Name="tbResult"
-                MinLines="20"/>
-        </StackPanel>
-    </StackPanel>
+                Grid.Row="1"
+                MinLines="15"
+                TabIndex="30"/>
+        </Grid>
+    </Grid>
 </Window>

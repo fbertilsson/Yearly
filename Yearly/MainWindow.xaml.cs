@@ -28,5 +28,10 @@ namespace Yearly
                 tbResult.Text = ex.ToString();
             }
         }
+
+        private void OnWindowLoaded(object sender, RoutedEventArgs e)
+        {
+            tbSource.Focus();
+        }
     }
 }
