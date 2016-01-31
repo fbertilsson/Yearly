@@ -21,24 +21,24 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Grid
-            Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock
-                Grid.Row="0">Copy some rows of dates and values and paste here:</TextBlock>
-            <TextBox
-                Grid.Row="1"
-                MinLines="15"
-                AcceptsReturn="True"
-                AcceptsTab="True"
-                TabIndex="1"
-                x:Name="tbSource"/>
-        </Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock
+            Grid.Row="0"
+            Grid.Column="0">Copy some rows of dates and values and paste here:</TextBlock>
+        <TextBox
+            Grid.Row="1"
+            Grid.Column="0"
+            MinLines="15"
+            AcceptsReturn="True"
+            AcceptsTab="True"
+            TabIndex="1"
+            x:Name="tbSource"/>
         
         <Button
+            Grid.Row="1"
             Grid.Column="1"
             Height="130"
             Margin="10,4"
@@ -49,19 +49,14 @@
             Content="Periodize" 
             Click="ButtonClick"/>
 
-        <Grid
-            Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <TextBlock Grid.Row="0">The periodized result:</TextBlock>
-            <TextBox
+        <TextBlock 
+            Grid.Row="0"
+            Grid.Column="2">The periodized result:</TextBlock>
+        <TextBox
                 x:Name="tbResult"
                 Grid.Row="1"
+                Grid.Column="2"
                 MinLines="15"
                 TabIndex="30"/>
-        </Grid>
     </Grid>
 </Window>
