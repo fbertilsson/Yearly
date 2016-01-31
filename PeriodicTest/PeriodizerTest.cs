@@ -124,5 +124,29 @@ namespace PeriodicTest
             Assert.Equal(y, tvq.V);
             Assert.Equal(Quality.Interpolated, tvq.Q);
         }
+
+        [Fact]
+        public void InsertPoints_WhenTwoPointsAdjacentYears_InsertsInterpolatedValues()
+        {
+            // Arrange
+            var ts = new Timeseries { m_Tvqs.Tvq20150101, m_Tvqs.Tvq20160601};
+
+            // Act
+            var result = new Periodizer().InsertPoints(ts, Interval.Year);
+
+            // Assert
+            Assert.Equal(5, result.Count);
+            var dt = ts[1].Time - ts[0].Time;
+            // y = k*x + m
+            var k = (ts[1].V - ts[0].V) / dt.TotalSeconds;
+            var t1 = new DateTime(2015, 12, 31, 23, 59, 59);
+            var x = (t1 - ts[0].Time).TotalSeconds;
+            var y = k * x + ts[0].V;
+            var tvq1 = result[1];
+            Assert.Equal(t1, tvq1.Time);
+            Assert.Equal(y, tvq1.V);
+            Assert.Equal(Quality.Interpolated, tvq1.Q);
+        }
+
     }
 }
