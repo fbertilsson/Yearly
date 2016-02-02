@@ -10,7 +10,7 @@ namespace Periodic
         /// </summary>
         /// <param name="timeseries"></param>
         /// <returns></returns>
-        public IEnumerable<Timeseries> SplitPerYear(Timeseries timeseries) {
+        public IList<Timeseries> SplitPerYear(Timeseries timeseries) {
 
             if (! timeseries.Any())
             {

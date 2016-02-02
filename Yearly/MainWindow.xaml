@@ -36,19 +36,30 @@
             AcceptsTab="True"
             TabIndex="1"
             x:Name="tbSource"/>
-        
-        <Button
+        <StackPanel
             Grid.Row="1"
-            Grid.Column="1"
+            Grid.Column="1">
+        <Button
             Height="130"
             Margin="10,4"
             Padding="6"
             TabIndex="20"
             VerticalAlignment="Top"
             IsDefault="True"
-            Content="Periodize" 
-            Click="ButtonClick"/>
+            Content="Insert Points" 
+            Click="InsertPointsClick"/>
 
+        <Button
+            Height="130"
+            Margin="10,4"
+            Padding="6"
+            TabIndex="20"
+            VerticalAlignment="Top"
+            IsDefault="True"
+            Content="Split Yearly" 
+            Click="SplitYearlyClick"/>
+        </StackPanel>
+        
         <TextBlock 
             Grid.Row="0"
             Grid.Column="2">The periodized result:</TextBlock>

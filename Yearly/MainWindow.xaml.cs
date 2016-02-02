@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using Periodic;
 
@@ -15,13 +16,45 @@ namespace Yearly
 
         }
 
-        private void ButtonClick(object sender, RoutedEventArgs e)
+        private void InsertPointsClick(object sender, RoutedEventArgs e)
         {
             try
             {
                 var ts = TsParser.ParseTimeseries(tbSource.Text);
                 var result = new Periodizer().InsertPoints(ts, Interval.Year);
                 tbResult.Text = result.ToString();
+            }
+            catch (Exception ex)
+            {
+                tbResult.Text = ex.ToString();
+            }
+        }
+
+        private void SplitYearlyClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var ts = TsParser.ParseTimeseries(tbSource.Text);
+                var tsWithInserts = new Periodizer().InsertPoints(ts, Interval.Year);
+                var splitPerYear = new Splitter().SplitPerYear(tsWithInserts);
+
+                string result = string.Empty;
+                var maxEntries = splitPerYear.Max(x => x.Count);
+                for (var i = 0; i < maxEntries; i++)
+                {
+                    string line = string.Empty;
+                    foreach (var series in splitPerYear)
+                    {
+                        if (series.Count > i)
+                        {
+                            line += series[i];
+                            line += '\t';
+                        }
+                    }
+                    result += line + "\r\n";
+                }
+
+                tbResult.Text = result;
             }
             catch (Exception ex)
             {
@@ -41,5 +74,6 @@ namespace Yearly
 ";
             tbSource.SelectAll();
         }
+
     }
 }

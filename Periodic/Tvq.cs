@@ -16,5 +16,10 @@ namespace Periodic
             V = v;
             Q = q;
         }
+
+        public override string ToString()
+        {
+            return $"{Time}\t{V}\t{Q}";
+        }
     }
 }
