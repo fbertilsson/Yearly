@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Periodic
@@ -78,6 +80,31 @@ namespace Periodic
             return result;
         }
 
+        /// <summary>
+        /// Return a time series with one entry per month
+        /// where the time is the first second of the month
+        /// and the value is the average.
+        /// </summary>
+        /// <param name="ts"></param>
+        /// <returns></returns>
+        public Timeseries MonthlyAverage(Timeseries ts)
+        {
+            var result = new Timeseries();
+            //if (ts != null && ts.Any())
+            //{
+            //    result.Add(ts[0]);
+            //}
+            result = new Aggregate().Apply(new Average(), ts);
+            return result;
+        }
+
+        /// <summary>
+        /// Linearly interpolates or extrapolates the value at t
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="tvq1"></param>
+        /// <param name="tvq2"></param>
+        /// <returns></returns>
         private static Tvq CalculateValueAt(DateTime t, Tvq tvq1, Tvq tvq2)
         {
             var dx = tvq2.Time - tvq1.Time;
