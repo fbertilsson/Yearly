@@ -1,10 +1,7 @@
 ﻿using Xunit;
 using Periodic;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PeriodicTest
 {
@@ -176,7 +173,7 @@ namespace PeriodicTest
         }
 
         [Fact]
-        public void MonthlyAverage_WhenOneValueInJan_ReturnsItAsAverageAtFirstSecond()
+        public void MonthlyAverage_WhenOneValueInJan_ReturnsAsAverageAtFirstSecond()
         {
             // Arrange
             // Act
@@ -188,6 +185,66 @@ namespace PeriodicTest
             const int nDays = 31 - 5 + 1;
             var expectedValue = m_Tvqs.Tvq20150105.V * nDays / 31;
             Assert.Equal(expectedValue, x.V, 5);
+        }
+
+        [Fact]
+        public void MonthlyAverage_When2ValuesInMiddleOfJan_ReturnsAsAverageAtFirstSecond()
+        {
+            // Arrange
+            // Act
+            const double v = 500;
+            var ts = new Timeseries
+            {
+                new Tvq(m_Tvqs.Tvq20150105.Time, v, Quality.Ok),
+                new Tvq(m_Tvqs.Tvq20150110.Time, 0, Quality.Ok)
+            };
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            var x = averages[0];
+            Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
+            const int nDays = 10 - 5;
+            var expectedValue = (v * nDays) / 2 / 31;
+            Assert.Equal(expectedValue, x.V, 4);
+        }
+
+        [Fact]
+        public void MonthlyAverage_When1ValueInMiddleOfJanAnd1InFeb_InterpolatesEndValue()
+        {
+            // Arrange
+            // Act
+            const double v = 600;
+            var ts = new Timeseries
+            {
+                new Tvq(m_Tvqs.Tvq20150110.Time, v, Quality.Ok),
+                new Tvq(new DateTime(2015, 2, 23, 0, 0, 0), 0, Quality.Ok)
+            };
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            var x = averages[0];
+            Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
+            const int nDays = 31 - 10 + 1;
+            var expectedValue = (v + 300d) / 2d * (nDays / 31d);
+            Assert.Equal(expectedValue, x.V, 4);
+        }
+
+        [Fact]
+        public void MonthlyAverage_WhenConstantValueInJanAndFeb_ReturnsIt()
+        {
+            // Arrange
+            // Act
+            const double v = 1000;
+            var ts = new Timeseries
+            {
+                new Tvq(m_Tvqs.Tvq20150101.Time, v, Quality.Ok),
+                new Tvq(m_Tvqs.Tvq20150110.Time, v, Quality.Ok),
+                new Tvq(new DateTime(2015, 2, 21, 0, 0, 0), v, Quality.Ok)
+            };
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            Assert.Equal(v, averages[0].V, 4);
         }
     }
 }

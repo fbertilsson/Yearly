@@ -39,7 +39,7 @@ namespace Periodic
             for (i = 0; i < ts.Count; i++)
             {
                 current = ts[i];
-                if (current.Time >= t0)
+                if (current.Time > t0)
                 {
                     break;
                 }
@@ -61,15 +61,24 @@ namespace Periodic
             for (i++; i < ts.Count; i++)
             {
                 current = ts[i];
-                if (current.Time >= t1)
+                if (current.Time == t1)
                 {
-                    valueAtT1 = 2000; // TODO interpolate
+                    valueAtT1 = current.V;
+                }
+                else if (current.Time > t1)
+                {
+                    valueAtT1 = Tvq.CalculateValueAt(t1, previous, current).V;
                     break;
                 }
 
                 var dt = (current.Time - previous.Time).TotalSeconds;
-                area += previous.V * dt;
+                area += (previous.V + current.V) / 2 * dt;
                 previous = current;
+            }
+
+            if (current.Time < t1)
+            {
+                valueAtT1 = current.V; // Extrapolate current value to end of period
             }
 
             area += ((previous.V + valueAtT1) / 2) * (t1 - previous.Time).TotalSeconds;

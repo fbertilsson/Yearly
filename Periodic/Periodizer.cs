@@ -24,7 +24,8 @@ namespace Periodic
             for (var i = 0; i < ts.Count; i++)
             {
                 var current = ts[i];
-                var isNewInterval = i == 0 || 
+                var isNewInterval = 
+                    i == 0 || 
                     (previous != null && previous.Time.Year != current.Time.Year);
 
                 //
@@ -34,7 +35,7 @@ namespace Periodic
                 if (doInsertPreviousEnd)
                 {
                     var lastSecondOfPrevious = new DateTime(previous.Time.Year, 12, 31, 23, 59, 59);
-                    var tvq = CalculateValueAt(lastSecondOfPrevious, previous, current);
+                    var tvq = Tvq.CalculateValueAt(lastSecondOfPrevious, previous, current);
                     result.Add(tvq);
                 }
 
@@ -46,8 +47,7 @@ namespace Periodic
                 if (isNewInterval && t > firstSecond)
                 {
                     var newTvq = previous == null ?
-                        new Tvq(firstSecond, current.V, Quality.Interpolated) : 
-                        CalculateValueAt(firstSecond, previous, current);
+                        new Tvq(firstSecond, current.V, Quality.Interpolated) : Tvq.CalculateValueAt(firstSecond, previous, current);
                     result.Add(newTvq);
                 }
 
@@ -72,7 +72,7 @@ namespace Periodic
                     }
                     else if (lastTvq.Time < lastSecond)
                     {
-                        var newTvq = CalculateValueAt(lastSecond, ts[iLast - 1], lastTvq);
+                        var newTvq = Tvq.CalculateValueAt(lastSecond, ts[iLast - 1], lastTvq);
                         result.Add(newTvq);
                     }
                 }
@@ -89,33 +89,8 @@ namespace Periodic
         /// <returns></returns>
         public Timeseries MonthlyAverage(Timeseries ts)
         {
-            var result = new Timeseries();
-            //if (ts != null && ts.Any())
-            //{
-            //    result.Add(ts[0]);
-            //}
-            result = new Aggregate().Apply(new Average(), ts);
+            var result = new Aggregate().Apply(new Average(), ts);
             return result;
-        }
-
-        /// <summary>
-        /// Linearly interpolates or extrapolates the value at t
-        /// </summary>
-        /// <param name="t"></param>
-        /// <param name="tvq1"></param>
-        /// <param name="tvq2"></param>
-        /// <returns></returns>
-        private static Tvq CalculateValueAt(DateTime t, Tvq tvq1, Tvq tvq2)
-        {
-            var dx = tvq2.Time - tvq1.Time;
-            var dy = tvq2.V - tvq1.V;
-            var k = dy/dx.TotalSeconds;
-
-            var x = (t - tvq1.Time).TotalSeconds;
-            var y = k*x + tvq1.V;
-
-            var tvq = new Tvq(t, y, Quality.Interpolated);
-            return tvq;
         }
     }
 }
