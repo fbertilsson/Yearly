@@ -246,5 +246,63 @@ namespace PeriodicTest
             //Assert
             Assert.Equal(v, averages[0].V, 4);
         }
+
+        [Fact]
+        public void MonthlyAverage_WhenConstantValueInJanAndJune_FebThroughMayAreCorrect()
+        {
+            // Arrange
+            // Act
+            const double v = 1000;
+            var ts = new Timeseries
+            {
+                new Tvq(m_Tvqs.Tvq20150101.Time, v, Quality.Ok),
+                new Tvq(m_Tvqs.Tvq20150601.Time, v, Quality.Ok)
+            };
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            Assert.Equal(v, averages[1].V, 4);
+            Assert.Equal(v, averages[2].V, 4);
+            Assert.Equal(v, averages[3].V, 4);
+            Assert.Equal(v, averages[4].V, 4);
+        }
+
+        [Fact]
+        public void MonthlyAverage_WhenFrom2015To2016_TimesAreCorrect()
+        {
+            // Arrange
+            // Act
+            const double v = 1000;
+            var ts = new Timeseries
+            {
+                new Tvq(m_Tvqs.Tvq20150601.Time, v, Quality.Ok),
+                new Tvq(m_Tvqs.Tvq20160601.Time, v, Quality.Ok)
+            };
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            Assert.Equal(new DateTime(2015, 06, 01, 0, 0, 0), averages[0].Time);
+            Assert.Equal(new DateTime(2015, 07, 01, 0, 0, 0), averages[1].Time);
+            Assert.Equal(new DateTime(2015, 12, 01, 0, 0, 0), averages[6].Time);
+            Assert.Equal(new DateTime(2016, 01, 01, 0, 0, 0), averages[7].Time);
+            Assert.Equal(new DateTime(2016, 06, 01, 0, 0, 0), averages[12].Time);
+        }
+
+        [Fact]
+        public void MonthlyAverage_WhenFrom2015To2017_LastMonthIsCorrect()
+        {
+            // Arrange
+            // Act
+            const double v = 1000;
+            var ts = new Timeseries
+            {
+                new Tvq(m_Tvqs.Tvq20150601.Time, v, Quality.Ok),
+                new Tvq(m_Tvqs.Tvq20170601.Time, v, Quality.Ok)
+            };
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            Assert.Equal(new DateTime(2017, 06, 01, 0, 0, 0), averages.Last().Time);
+        }
     }
 }

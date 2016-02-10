@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using Periodic;
@@ -10,6 +13,8 @@ namespace Yearly
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const char ColumnSeparator = '\t';
+
         public MainWindow()
         {
             InitializeComponent();
@@ -48,7 +53,7 @@ namespace Yearly
                         if (series.Count > i)
                         {
                             line += series[i];
-                            line += '\t';
+                            line += ColumnSeparator;
                         }
                     }
                     result += line + "\r\n";
@@ -60,6 +65,60 @@ namespace Yearly
             {
                 tbResult.Text = ex.ToString();
             }
+        }
+
+        private void SplitMonthlyClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var ts = TsParser.ParseTimeseries(tbSource.Text);
+                var tsMonthly = new Periodizer().MonthlyAverage(ts);
+                var splitPerYear = new Splitter().SplitPerYear(tsMonthly);
+
+                var writer = new StringWriter();
+
+                WriteSeriesHeaders(splitPerYear, writer);
+                
+                var maxEntries = splitPerYear.Max(x => x.Count);
+                for (var i = 0; i < maxEntries; i++)
+                {
+                    var monthNumber = i + 1;
+                    WriteRowHeader(monthNumber, writer);
+                   
+                    foreach (var series in splitPerYear)
+                    {
+                        if (series.Count > i)
+                        {
+                            writer.Write(series[i].V);
+                        }
+                        writer.Write(ColumnSeparator);
+                    }
+                    writer.WriteLine();
+                }
+
+                tbResult.Text = writer.ToString();
+            }
+            catch (Exception ex)
+            {
+                tbResult.Text = ex.ToString();
+            }
+        }
+
+        private void WriteSeriesHeaders(IList<Timeseries> tsList, StringWriter writer)
+        {
+            writer.Write(ColumnSeparator);
+            foreach (var ts in tsList)
+            {
+                writer.Write(ts.First().Time.Year);
+                writer.Write(ColumnSeparator);
+            }
+            writer.WriteLine();
+        }
+
+        private void WriteRowHeader(int monthNumber, StringWriter writer)
+        {
+            writer.Write(DateTimeFormatInfo.CurrentInfo.GetAbbreviatedMonthName(monthNumber));
+            writer.Write(ColumnSeparator);
         }
 
         private void OnWindowLoaded(object sender, RoutedEventArgs e)

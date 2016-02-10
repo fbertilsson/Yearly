@@ -39,25 +39,32 @@
         <StackPanel
             Grid.Row="1"
             Grid.Column="1">
-        <Button
-            Height="130"
-            Margin="10,4"
-            Padding="6"
-            TabIndex="20"
-            VerticalAlignment="Top"
-            IsDefault="True"
-            Content="Insert Points" 
-            Click="InsertPointsClick"/>
+            <Button
+                Margin="10,4"
+                Padding="6"
+                TabIndex="20"
+                VerticalAlignment="Top"
+                IsDefault="True"
+                Content="Insert Points" 
+                Click="InsertPointsClick"/>
 
-        <Button
-            Height="130"
-            Margin="10,4"
-            Padding="6"
-            TabIndex="20"
-            VerticalAlignment="Top"
-            IsDefault="True"
-            Content="Split Yearly" 
-            Click="SplitYearlyClick"/>
+            <Button
+                Margin="10,4"
+                Padding="6"
+                TabIndex="20"
+                VerticalAlignment="Top"
+                IsDefault="True"
+                Content="Split Yearly" 
+                Click="SplitYearlyClick"/>
+
+            <Button
+                Margin="10,4"
+                Padding="6"
+                TabIndex="20"
+                VerticalAlignment="Top"
+                IsDefault="True"
+                Content="Split Monthly" 
+                Click="SplitMonthlyClick"/>
         </StackPanel>
         
         <TextBlock 
