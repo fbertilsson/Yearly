@@ -302,7 +302,26 @@ namespace PeriodicTest
             var averages = m_Periodizer.MonthlyAverage(ts);
 
             //Assert
-            Assert.Equal(new DateTime(2017, 06, 01, 0, 0, 0), averages.Last().Time);
+            var last = averages.Last();
+            Assert.Equal(new DateTime(2017, 06, 01, 0, 0, 0), last.Time);
+            Assert.Equal(v, last.V);
+        }
+
+        [Fact]
+        public void MonthlyAverage_WhenFrom2015To2017_June2016IsCorrect()
+        {
+            // Arrange
+            // Act
+            var ts = new Timeseries
+            {
+                new Tvq(m_Tvqs.Tvq20150601.Time, 200, Quality.Ok),
+                new Tvq(new DateTime(2017, 07, 01, 0, 0, 0), 400, Quality.Ok)
+            };
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            var average = averages.First(a => a.Time == m_Tvqs.Tvq20160601.Time);
+            Assert.Equal(300d, average.V, 4);
         }
     }
 }

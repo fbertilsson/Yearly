@@ -87,9 +87,13 @@ namespace Yearly
                    
                     foreach (var series in splitPerYear)
                     {
-                        if (series.Count > i)
+                        var firstMonthInSeries = series[0].Time.Month;
+                        var startMonthDelta = firstMonthInSeries - 1;
+                        var index = i - startMonthDelta;
+
+                        if (index >= 0 && index < series.Count)
                         {
-                            writer.Write(series[i].V);
+                            writer.Write(series[index].V);
                         }
                         writer.Write(ColumnSeparator);
                     }
