@@ -308,7 +308,7 @@ namespace PeriodicTest
         }
 
         [Fact]
-        public void MonthlyAverage_WhenFrom2015To2017_June2016IsCorrect()
+        public void MonthlyAverage_WhenFrom2015To2017_June2016IsAverage()
         {
             // Arrange
             // Act
@@ -321,7 +321,7 @@ namespace PeriodicTest
 
             //Assert
             var average = averages.First(a => a.Time == m_Tvqs.Tvq20160601.Time);
-            Assert.Equal(300d, average.V, 4);
+            Assert.Equal(300d, average.V, 0);
         }
     }
 }

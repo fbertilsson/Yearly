@@ -57,6 +57,11 @@ namespace Periodic
 
             Debug.Assert(ts[currentIndex].Time >= t0);
 
+            if (currentIndex > 0)
+            {
+                v0 = Tvq.CalculateValueAt(t0, ts[currentIndex - 1], ts[currentIndex]).V;
+            }
+
             double area = 0;
 
             bool tsHasValueWithinPeriod = current.Time <= t1;
