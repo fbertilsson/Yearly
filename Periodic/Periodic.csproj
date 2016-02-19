@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Algorithm.cs" />
     <Compile Include="Interval.cs" />
+    <Compile Include="MonthlyValueRenderer.cs" />
     <Compile Include="Periodizer.cs" />
     <Compile Include="Splitter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

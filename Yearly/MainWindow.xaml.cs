@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -11,9 +9,9 @@ namespace Yearly
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
-        private const char ColumnSeparator = '\t';
+        private const string ColumnSeparator = "\t";
 
         public MainWindow()
         {
@@ -77,28 +75,8 @@ namespace Yearly
 
                 var writer = new StringWriter();
 
-                WriteSeriesHeaders(splitPerYear, writer);
-                
-                var maxEntries = splitPerYear.Max(x => x.Count);
-                for (var i = 0; i < maxEntries; i++)
-                {
-                    var monthNumber = i + 1;
-                    WriteRowHeader(monthNumber, writer);
-                   
-                    foreach (var series in splitPerYear)
-                    {
-                        var firstMonthInSeries = series[0].Time.Month;
-                        var startMonthDelta = firstMonthInSeries - 1;
-                        var index = i - startMonthDelta;
-
-                        if (index >= 0 && index < series.Count)
-                        {
-                            writer.Write(series[index].V);
-                        }
-                        writer.Write(ColumnSeparator);
-                    }
-                    writer.WriteLine();
-                }
+                var renderer = new MonthlyValueTextRenderer(ColumnSeparator);
+                renderer.Render(splitPerYear, writer);
 
                 tbResult.Text = writer.ToString();
             }
@@ -108,23 +86,7 @@ namespace Yearly
             }
         }
 
-        private void WriteSeriesHeaders(IList<Timeseries> tsList, StringWriter writer)
-        {
-            writer.Write(ColumnSeparator);
-            foreach (var ts in tsList)
-            {
-                writer.Write(ts.First().Time.Year);
-                writer.Write(ColumnSeparator);
-            }
-            writer.WriteLine();
-        }
-
-        private void WriteRowHeader(int monthNumber, StringWriter writer)
-        {
-            writer.Write(DateTimeFormatInfo.CurrentInfo.GetAbbreviatedMonthName(monthNumber));
-            writer.Write(ColumnSeparator);
-        }
-
+   
         private void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
             tbSource.Focus();
