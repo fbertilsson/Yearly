@@ -30,7 +30,6 @@ namespace YearlyWeb2.Controllers
         {
             ViewBag.Title = "Mätarställning registrerad";
             ViewBag.SubTitle = "Mätarställningen blev registrerad";
-            ViewBag.Action = "FOO";
             return View(model);
         }
     }
