@@ -1,4 +1,5 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
+﻿using System;
+using Microsoft.WindowsAzure.Storage.Table;
 using Periodic;
 
 namespace YearlyWeb2.DataLayer
@@ -18,8 +19,15 @@ namespace YearlyWeb2.DataLayer
         {
         }
 
+        public DateTime T { get { return new DateTime(long.Parse(RowKey));} }
+
         public double V { get; set; }
 
         public Quality Q { get; set; }
+
+        public Tvq ToTvq()
+        {
+            return new Tvq(T, V, Q);
+        }
     }
 }
