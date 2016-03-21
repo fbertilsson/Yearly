@@ -8,6 +8,10 @@ using System.Web.Mvc;
 using Newtonsoft.Json;
 using Periodic;
 using YearlyWeb2.Models;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Storage.Table;
+using YearlyWeb2.DataLayer;
 
 namespace YearlyWeb2.Controllers
 {
@@ -35,11 +39,39 @@ namespace YearlyWeb2.Controllers
             bool ok;
             DateTime t;
             int v;
-            ok = DateTime.TryParse(model.DateString, out t); // TODO error handling
-            ok = int.TryParse(model.RegisterValue, out v); // TODO error handling
-            // TODO FB if (! ok) return ...
+            ok = DateTime.TryParse(model.DateString, out t);
+            if (!ok)
+            {
+                ViewBag.Title = "Fel vid registrering";
+                ViewBag.SubTitle = "Datum kunde ej tolkas";
+                return View(model);
+            }// TODO better error handling
+
+            ok = int.TryParse(model.RegisterValue, out v);
+            if (!ok)
+            {
+                ViewBag.Title = "Fel vid registrering";
+                ViewBag.SubTitle = "Mätarställning kunde ej tolkas";
+                return View(model);
+            }// TODO better error handling
+
+            var now = DateTime.Now;
+            var isToday = 
+                t.Year == now.Year
+                && t.Month == now.Month
+                && t.Day == now.Day;
+            if (isToday)
+            {
+                t = now;
+            }
+
             var tvq = new Tvq(t, v, Quality.Ok);
 
+            var storageAccount = CloudStorageAccount.Parse(
+                CloudConfigurationManager.GetSetting("StorageConnectionString"));
+
+            var repo = new RegistryEntryRepo(storageAccount);
+            repo.AddRegistryEntry(tvq);
 
             ViewBag.Title = "Mätarställning registrerad";
             ViewBag.SubTitle = "Mätarställningen blev registrerad";
