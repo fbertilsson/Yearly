@@ -1,23 +1,18 @@
-﻿@model IEnumerable<Periodic.Tvq>
+﻿@model Periodic.Timeseries
 
 @{
-    ViewBag.Title = "PeriodicView";
+    ViewBag.Title = "Månatlig förbrukning";
 }
 
-<h2>PeriodicView</h2>
+<h2>Månatlig förbrukning</h2>
 
 @*<p>
     @Html.ActionLink("Create New", "Create")
 </p>*@
 <table class="table">
     <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Time)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.V)
-        </th>
-        <th></th>
+        <th>Månad</th>
+        <th>Förbrukning</th>
     </tr>
 
 @foreach (var item in Model) {

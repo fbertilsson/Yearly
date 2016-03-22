@@ -1,6 +1,8 @@
 ﻿using System.Web.Mvc;
+using System.Linq;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
+using Periodic;
 using YearlyWeb2.DataLayer;
 
 namespace YearlyWeb2.Controllers
@@ -14,9 +16,14 @@ namespace YearlyWeb2.Controllers
                CloudConfigurationManager.GetSetting("StorageConnectionString"));
 
             var repo = new RegistryEntryRepo(storageAccount);
-            var tvqs = repo.GetRegistryEntries();
+            var sortedTvqs = repo.GetRegistryEntries().OrderBy(x => x.Time);
+            var ts = new Timeseries();
+            ts.AddRange(sortedTvqs);
 
-            return View(tvqs);
+            var periodizer = new Periodizer();
+            var monthlyAverages = periodizer.MonthlyAverage(ts);
+
+            return View(monthlyAverages);
         }
     }
 }
