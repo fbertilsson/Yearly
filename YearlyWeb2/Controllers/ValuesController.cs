@@ -1,17 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Storage;
 using Periodic;
+using YearlyWeb2.DataLayer;
 
 namespace YearlyWeb2.Controllers
 {
     //[Authorize]
     public class ValuesController : ApiController
     {
+        [Route("api/periodic/{registerId}/monthly/csv")]
+        [HttpGet]
+        public string MonthlyValues(string registerId)
+        {
+            var monthlyAverages = GetMonthlyAverages(registerId);
+            var tsMonthly = new Periodizer().MonthlyAverage(monthlyAverages);
+            var splitPerYear = new Splitter().SplitPerYear(tsMonthly);
+
+            var writer = new StringWriter();
+            var renderer = new MonthlyValueTextRenderer(CultureInfo.InvariantCulture);
+            renderer.Render(splitPerYear, writer);
+
+            return writer.ToString();
+        }
+
+
+        public static Timeseries GetMonthlyAverages(string registerId)
+        {
+            var storageAccount = CloudStorageAccount.Parse(
+                CloudConfigurationManager.GetSetting("StorageConnectionString"));
+
+            var repo = new RegistryEntryRepo(storageAccount);
+            var sortedTvqs = repo.GetRegistryEntries().OrderBy(x => x.Time);
+            var ts = new Timeseries();
+            ts.AddRange(sortedTvqs);
+
+            var periodizer = new Periodizer();
+            var monthlyAverages = periodizer.MonthlyAverage(ts);
+            return monthlyAverages;
+        }
+
         // GET api/values
         public IEnumerable<string> Get()
         {

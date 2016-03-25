@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -75,7 +76,7 @@ namespace Yearly
 
                 var writer = new StringWriter();
 
-                var renderer = new MonthlyValueTextRenderer(ColumnSeparator);
+                var renderer = new MonthlyValueTextRenderer(CultureInfo.CurrentCulture, ColumnSeparator);
                 renderer.Render(splitPerYear, writer);
 
                 tbResult.Text = writer.ToString();

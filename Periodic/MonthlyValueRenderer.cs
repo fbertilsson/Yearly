@@ -11,10 +11,12 @@ namespace Periodic
     /// </summary>
     public class MonthlyValueTextRenderer
     {
+        private readonly CultureInfo m_CultureInfo;
         private string ColumnSeparator { get; set; }
 
-        public MonthlyValueTextRenderer(string columnSeparator = "\t")
+        public MonthlyValueTextRenderer(CultureInfo cultureInfo, string columnSeparator = "\t")
         {
+            m_CultureInfo = cultureInfo;
             ColumnSeparator = columnSeparator;
         }
 
@@ -36,7 +38,10 @@ namespace Periodic
 
                     if (index >= 0 && index < series.Count)
                     {
-                        writer.Write(series[index].V);
+                        var v = series[index].V;
+                        var numberFormat = m_CultureInfo.NumberFormat;
+                        var formattedValue = v.ToString(numberFormat);
+                        writer.Write(formattedValue);
                     }
                     writer.Write(ColumnSeparator);
                 }
@@ -56,8 +61,17 @@ namespace Periodic
 
         private void WriteRowHeader(int monthNumber, StringWriter writer)
         {
-            writer.Write(DateTimeFormatInfo.CurrentInfo.GetAbbreviatedMonthName(monthNumber));
+            if (UseAbbreviatedMonthName)
+            {
+                writer.Write(DateTimeFormatInfo.CurrentInfo.GetAbbreviatedMonthName(monthNumber));
+            }
+            else
+            {
+                writer.Write(monthNumber);
+            }
             writer.Write(ColumnSeparator);
         }
+
+        public bool UseAbbreviatedMonthName { get; set; }
     }
 }
