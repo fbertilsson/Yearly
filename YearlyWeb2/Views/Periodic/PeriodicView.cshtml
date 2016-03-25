@@ -32,3 +32,29 @@
 }
 
 </table>
+
+<div id="graphdiv"></div>
+<script type="text/javascript"
+        src="~/Scripts/dygraph-combined-dev.js"></script>
+<script type="text/javascript">
+  g = new Dygraph(
+
+    // containing div
+    document.getElementById("graphdiv"),
+
+    // CSV or path to a CSV file.
+    "Månad,2014, 2015\n" +
+    "2014-01-01,200,210\n" +
+    "2014-02-01,190,195\n" +
+    "2014-03-01,160,155\n" +
+    "2014-04-01,155,166\n" +
+    "2014-05-01,130,120\n" +
+    "2014-06-01,100,110\n" +
+    "2014-07-01,105,90\n" +
+    "2014-08-01,120,110\n" +
+    "2014-09-01,110,115\n" +
+    "2014-10-01,140,133\n" +
+    "2014-11-01,160,155\n" +
+    "2014-12-01,190,188\n" 
+  );
+</script>
