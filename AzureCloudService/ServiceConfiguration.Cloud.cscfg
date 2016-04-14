@@ -3,8 +3,8 @@
   <Role name="YearlyWeb2">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
-      <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=fbmetering;AccountKey=YbxfAhuYLYOnAKMm0pEhLkhYX0VzokUMBGks7x9p3Lt3gDiBSuXh6Vb+pTCgZ1ZY/QnKcVquJ7BLrcjOLY6mKg==" />
+      <Setting name="StorageConnectionString" value="DefaultEndpointsProtocol=https;AccountName=metered157;AccountKey=zYv+PAQbyjezs0ejwE8utxYN7yyLn6aNrO07GfRCztThDrnyVH2VDo8JKWInaqy4G51TVsCgAqKbAGY+ZUxCoA==;BlobEndpoint=https://metered157.blob.core.windows.net/;TableEndpoint=https://metered157.table.core.windows.net/;QueueEndpoint=https://metered157.queue.core.windows.net/;FileEndpoint=https://metered157.file.core.windows.net/" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
