@@ -29,7 +29,7 @@ namespace YearlyWeb2.Controllers
                 DateString = DateTime.Now.ToShortDateString(),
                 RegisterValue = string.Empty,
             };
-            
+
             return View(model);
         }
 
@@ -45,7 +45,7 @@ namespace YearlyWeb2.Controllers
                 ViewBag.Title = "Fel vid registrering";
                 ViewBag.SubTitle = "Datum kunde ej tolkas";
                 return View(model);
-            }// TODO better error handling
+            } // TODO better error handling
 
             ok = int.TryParse(model.RegisterValue, out v);
             if (!ok)
@@ -53,10 +53,10 @@ namespace YearlyWeb2.Controllers
                 ViewBag.Title = "Fel vid registrering";
                 ViewBag.SubTitle = "Mätarställning kunde ej tolkas";
                 return View(model);
-            }// TODO better error handling
+            } // TODO better error handling
 
             var now = DateTime.Now;
-            var isToday = 
+            var isToday =
                 t.Year == now.Year
                 && t.Month == now.Month
                 && t.Day == now.Day;
@@ -67,14 +67,47 @@ namespace YearlyWeb2.Controllers
 
             var tvq = new Tvq(t, v, Quality.Ok);
 
-            var storageAccount = CloudStorageAccount.Parse(
-                CloudConfigurationManager.GetSetting("StorageConnectionString"));
-
-            var repo = new RegistryEntryRepo(storageAccount);
+            var repo = GetRegistryEntryRepo();
             repo.AddRegistryEntry(tvq);
 
             ViewBag.Title = "Mätarställning registrerad";
             ViewBag.SubTitle = "Mätarställningen blev registrerad";
+            return View(model);
+        }
+
+        private RegistryEntryRepo GetRegistryEntryRepo()
+        {
+            var storageAccount = CloudStorageAccount.Parse(
+                CloudConfigurationManager.GetSetting("StorageConnectionString"));
+
+            var repo = new RegistryEntryRepo(storageAccount);
+            return repo;
+        }
+
+
+        public ActionResult RegisterEntriesView()
+        {
+            ViewBag.Title = "Registrera flera mätarställningar";
+            ViewBag.SubTitle = "Registrera flera mätarställningar";
+            ViewBag.Action = "Registrera";
+
+            var model = new RegisterEntriesModel();
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult SubmitRegisterEntries(RegisterEntriesModel model)
+        {
+            var timeseries = TsParser.ParseTimeseries(model.EntriesString);
+
+            var repo = GetRegistryEntryRepo();
+            foreach (var tvq in timeseries)
+            {
+                repo.AddRegistryEntry(tvq);
+            }
+
+            ViewBag.Title = "Mätarställningar registrerade";
+            ViewBag.SubTitle = "Mätarställningarna blev registrerade";
             return View(model);
         }
     }
