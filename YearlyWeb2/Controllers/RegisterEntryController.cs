@@ -4,13 +4,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Web;
+using System.Web.Http;
 using System.Web.Mvc;
 using Newtonsoft.Json;
 using Periodic;
 using YearlyWeb2.Models;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage.Table;
 using YearlyWeb2.DataLayer;
 
 namespace YearlyWeb2.Controllers
@@ -33,7 +33,7 @@ namespace YearlyWeb2.Controllers
             return View(model);
         }
 
-        [HttpPost]
+        [System.Web.Mvc.HttpPost]
         public ActionResult SubmitRegisterEntry(RegisterEntryModel model)
         {
             bool ok;
@@ -95,7 +95,7 @@ namespace YearlyWeb2.Controllers
             return View(model);
         }
 
-        [HttpPost]
+        [System.Web.Mvc.HttpPost]
         public ActionResult SubmitRegisterEntries(RegisterEntriesModel model)
         {
             var timeseries = TsParser.ParseTimeseries(model.EntriesString);
@@ -109,6 +109,42 @@ namespace YearlyWeb2.Controllers
             ViewBag.Title = "Mätarställningar registrerade";
             ViewBag.SubTitle = "Mätarställningarna blev registrerade";
             return View(model);
+        }
+
+        [System.Web.Mvc.HttpGet]
+        public ActionResult ListEntriesView()
+        {
+            var repo = GetRegistryEntryRepo();
+
+            var entries = repo.GetRegistryEntries();
+            var model = new Timeseries();
+            model.AddRange(entries);
+            
+            return View(model);
+        }
+
+        [System.Web.Mvc.HttpPost]
+        public ActionResult DeleteRegistryEntry([FromUri] string dateString)
+        {
+            DateTime t;
+            var ok = DateTime.TryParse(dateString, out t);
+            if (!ok)
+            {
+                ViewBag.Title = "Fel vid borttagning";
+                ViewBag.SubTitle = "Datum kunde ej tolkas";
+                return View("ListEntriesView");
+            } // TODO better error handling
+
+            var repo = GetRegistryEntryRepo();
+            ok = repo.DeleteRegistryEntry(t);
+            if (!ok)
+            {
+                ViewBag.Title = "Fel vid borttagning";
+                ViewBag.SubTitle = "Kunde ej ta bort registreringen";
+                return View("ListEntriesView");
+            }
+
+            return RedirectToAction("ListEntriesView");
         }
     }
 }

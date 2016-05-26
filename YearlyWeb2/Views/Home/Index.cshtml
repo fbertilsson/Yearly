@@ -12,11 +12,17 @@
         <p>Här kan du registrera flera mätarställningar</p>
         <p>@Html.ActionLink("Registrera flera", "RegisterEntriesView", "RegisterEntry", new { area = "" }, new { @class = "btn btn-primary btn-lg" })</p>
     </div>
-   
+
     <div class="col-md-4">
         <h2>Jämför</h2>
         <p>Jämför din förbrukning</p>
-        <p>@Html.ActionLink("Månatlig olika år", "PeriodicView", "Periodic", new { area = ""}, new {@class = "btn btn-primary btn-lg" })</p>
+        <p>@Html.ActionLink("Månatlig olika år", "PeriodicView", "Periodic", new {area = ""}, new {@class = "btn btn-primary btn-lg"})</p>
         @*<p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301872">Månatlig olika år &raquo;</a></p>*@
+    </div>
+
+    <div class="col-md-4">
+        <h2>Detaljer</h2>
+        <p>Se alla mätarställningar</p>
+        <p>@Html.ActionLink("Detaljer", "ListEntriesView", "RegisterEntry", new { area = "" }, new { @class = "btn btn-primary btn-lg" })</p>
     </div>
 </div>
