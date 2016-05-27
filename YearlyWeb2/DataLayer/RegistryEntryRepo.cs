@@ -66,7 +66,10 @@ namespace YearlyWeb2.DataLayer
             var table = tableClient.GetTableReference("registryentries");
             table.CreateIfNotExists();
 
-            var entity = new TvqEntity(m_PartitionKey, new Tvq(t, 0, Quality.Ok));
+            var entity = new TvqEntity(m_PartitionKey, new Tvq(t, 0, Quality.Ok))
+            {
+                ETag = "*"
+            };
             var deleteOperation = TableOperation.Delete(entity);
             var result = table.Execute(deleteOperation);
             var ok = result.HttpStatusCode == (int)HttpStatusCode.NoContent;

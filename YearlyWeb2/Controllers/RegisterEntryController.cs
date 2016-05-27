@@ -124,6 +124,7 @@ namespace YearlyWeb2.Controllers
         }
 
         [System.Web.Mvc.HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult DeleteRegistryEntry([FromUri] string dateString)
         {
             DateTime t;

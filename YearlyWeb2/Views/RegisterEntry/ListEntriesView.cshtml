@@ -1,51 +1,34 @@
-﻿@using System.Globalization
-@model Periodic.Timeseries
+﻿@model Periodic.Timeseries
 
 @{
     ViewBag.Title = "Mätarställningar";
 }
 
 <h2>@ViewBag.Title</h2>
-
 <table class="table">
     <tr>
         <th>Tidpunkt</th>
         <th>Mätarställning</th>
     </tr>
 
-        @*@Html.AntiForgeryToken()*@
-
-        @foreach (var item in Model)
-        {
-             <tr>
-                 <td>
-                     @Html.DisplayFor(modelItem => item.Time)
-                 </td>
-                 <td>
-                     @Html.DisplayFor(modelItem => item.V)
-                 </td>
-                 <td>
-                     @*@Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |*@
-
-                     @Ajax.ActionLink("Ta bort", "DeleteRegistryEntry", new { dateString = item.Time.ToString("O") },
-                         new AjaxOptions
-                         {
-                             HttpMethod = "Delete",
-                             Confirm = "Ta bort - är du säker?",
-                             OnComplete = "function() { $(this).parent().parent().remove() }"
-                         })
-
-                     @Html.ActionLink("Ta bort GET", "DeleteRegistryEntry", new { id = item.Time.ToString("O") })
-
-                     @using (Html.BeginForm("DeleteRegistryEntry", "RegisterEntry", FormMethod.Post))
-                     {
-                         @Html.ActionLink("Ta bort POST", "DeleteRegistryEntry", new { id = item.Time.ToString("O") }, new { IsPost = true })
-                     }
-                 </td>
-             </tr>
-        }
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Time)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.V)
+            </td>
+            <td>
+                @using (Html.BeginForm("DeleteRegistryEntry", "RegisterEntry", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("dateString", item.Time.ToString("O"))
+                    <input type="submit" role="button" value="Radera" class="btn"/>
+                }
+            </td>
+        </tr>
     }
 </table>
-
 
