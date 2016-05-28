@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Periodic
+namespace Periodic.Ts
 {
     public class Timeseries : List<Tvq>
     {
-        //public IList<Tvq<T>> m_Tvq = new List<Tvq<T>>();
-
         public new Timeseries Add(Tvq tvq)
         {
             base.Add(tvq);

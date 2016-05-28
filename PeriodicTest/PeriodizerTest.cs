@@ -2,6 +2,7 @@
 using Periodic;
 using System;
 using System.Linq;
+using Periodic.Ts;
 
 namespace PeriodicTest
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Periodic
+namespace Periodic.Ts
 {
     public class Tvq
     {

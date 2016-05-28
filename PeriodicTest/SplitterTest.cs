@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using Periodic;
 using System.Linq;
+using Periodic.Ts;
 
 namespace PeriodicTest
 {

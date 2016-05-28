@@ -41,17 +41,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorithm.cs" />
+    <Compile Include="Algo\Aggregate.cs" />
+    <Compile Include="Algo\Average.cs" />
+    <Compile Include="Algo\IAlgorithm.cs" />
+    <Compile Include="Algo\IUnaryOperator.cs" />
     <Compile Include="Interval.cs" />
     <Compile Include="MonthlyValueRenderer.cs" />
     <Compile Include="Periodizer.cs" />
     <Compile Include="Splitter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Timeseries.cs" />
     <Compile Include="TsParser.cs" />
-    <Compile Include="Tvq.cs" />
-    <Compile Include="VQ.cs" />
+    <Compile Include="Ts\Quality.cs" />
+    <Compile Include="Ts\Timeseries.cs" />
+    <Compile Include="Ts\Tvq.cs" />
+    <Compile Include="Ts\VQ.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

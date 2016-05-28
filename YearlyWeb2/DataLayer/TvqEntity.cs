@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.WindowsAzure.Storage.Table;
 using Periodic;
+using Periodic.Ts;
 
 namespace YearlyWeb2.DataLayer
 {
