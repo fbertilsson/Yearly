@@ -6,9 +6,8 @@
 
 <h2>Månatlig förbrukning</h2>
 
-@*<p>
-    @Html.ActionLink("Create New", "Create")
-</p>*@
+<div id="graphdiv"></div>
+
 <table class="table">
     <tr>
         <th>Månad</th>
@@ -32,8 +31,6 @@
 }
 
 </table>
-
-<div id="graphdiv"></div>
 
 <div>
     @Html.ActionLink("Tillbaka", "Index", "Home")
