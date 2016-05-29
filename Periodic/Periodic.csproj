@@ -43,8 +43,12 @@
   <ItemGroup>
     <Compile Include="Algo\Aggregate.cs" />
     <Compile Include="Algo\Average.cs" />
-    <Compile Include="Algo\IAlgorithm.cs" />
-    <Compile Include="Algo\IUnaryOperator.cs" />
+    <Compile Include="Algo\DeltaTsOperator.cs" />
+    <Compile Include="Algo\DeltaTvqOperator.cs" />
+    <Compile Include="Algo\IAggregateAlgorithm.cs" />
+    <Compile Include="Algo\IBinaryTvqOperator.cs" />
+    <Compile Include="Algo\IUnaryAggregateOperator.cs" />
+    <Compile Include="Algo\IUnaryTsOperator.cs" />
     <Compile Include="Interval.cs" />
     <Compile Include="MonthlyValueRenderer.cs" />
     <Compile Include="Periodizer.cs" />

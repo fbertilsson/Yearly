@@ -4,7 +4,7 @@ using Periodic.Ts;
 
 namespace Periodic.Algo
 {
-    public class Average : IUnaryOperator
+    public class Average : IUnaryAggregateOperator
     {
         public Tvq Apply(DateTime t0, DateTime t1, Timeseries ts)
         {

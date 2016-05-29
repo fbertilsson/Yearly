@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Formatting;
-using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
-using Newtonsoft.Json;
 using Periodic;
 using YearlyWeb2.Models;
 using Microsoft.WindowsAzure.Storage;
@@ -118,10 +113,11 @@ namespace YearlyWeb2.Controllers
             var repo = GetRegistryEntryRepo();
 
             var entries = repo.GetRegistryEntries();
-            var model = new Timeseries();
-            model.AddRange(entries);
-            
-            return View(model);
+            var sortedTvqs = entries.OrderBy(x => x.Time);
+            var tsWithRegisterEntries = new Timeseries();
+            tsWithRegisterEntries.AddRange(sortedTvqs.ToList());
+
+            return View(tsWithRegisterEntries);
         }
 
         [System.Web.Mvc.HttpPost]

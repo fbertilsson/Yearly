@@ -7,6 +7,7 @@ using System.Web.Http;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Periodic;
+using Periodic.Algo;
 using Periodic.Ts;
 using YearlyWeb2.DataLayer;
 
@@ -38,11 +39,15 @@ namespace YearlyWeb2.Controllers
 
             var repo = new RegistryEntryRepo(storageAccount);
             var sortedTvqs = repo.GetRegistryEntries().OrderBy(x => x.Time);
-            var ts = new Timeseries();
-            ts.AddRange(sortedTvqs);
+
+            var tsWithRegisterEntries = new Timeseries();
+            tsWithRegisterEntries.AddRange(sortedTvqs.ToList());
+
+            var deltaOperator = new DeltaTsOperator();
+            var tsWithConsumption = deltaOperator.Apply(tsWithRegisterEntries);
 
             var periodizer = new Periodizer();
-            var monthlyAverages = periodizer.MonthlyAverage(ts);
+            var monthlyAverages = periodizer.MonthlyAverage(tsWithConsumption);
             return monthlyAverages;
         }
 

@@ -4,9 +4,9 @@ using Periodic.Ts;
 
 namespace Periodic.Algo
 {
-    public class Aggregate : IAlgorithm
+    public class Aggregate : IAggregateAlgorithm
     {
-        public Timeseries Apply(IUnaryOperator op, Timeseries ts)
+        public Timeseries Apply(IUnaryAggregateOperator op, Timeseries ts)
         {
             if (ts == null || ! ts.Any()) return new Timeseries();
 
