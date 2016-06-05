@@ -183,8 +183,7 @@ namespace PeriodicTest
             //Assert
             var x = averages[0];
             Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
-            const int nDays = 31 - 5 + 1;
-            var expectedValue = m_Tvqs.Tvq20150105.V * nDays / 31;
+            var expectedValue = m_Tvqs.Tvq20150105.V;
             Assert.Equal(expectedValue, x.V, 5);
         }
 
@@ -204,8 +203,9 @@ namespace PeriodicTest
             //Assert
             var x = averages[0];
             Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
-            const int nDays = 10 - 5;
-            var expectedValue = (v * nDays) / 2 / 31;
+            var area1 = 4 * v;
+            var area2 = 5 * v / 2;
+            var expectedValue = (area1 + area2) / 31;
             Assert.Equal(expectedValue, x.V, 4);
         }
 
@@ -225,9 +225,11 @@ namespace PeriodicTest
             //Assert
             var x = averages[0];
             Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
+            var area1 = 9 * v;
             const int nDays = 31 - 10 + 1;
-            var expectedValue = (v + 300d) / 2d * (nDays / 31d);
-            Assert.Equal(expectedValue, x.V, 4);
+            var area2 = (v + 300d) / 2d * nDays;
+            var expectedValue = (area1 + area2) / 31d;
+            Assert.Equal(expectedValue, x.V, 3);
         }
 
         [Fact]

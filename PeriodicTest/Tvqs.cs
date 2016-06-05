@@ -4,7 +4,7 @@ using Periodic.Ts;
 
 namespace PeriodicTest
 {
-    class Tvqs
+    public class Tvqs
     {
         public Tvq Tvq20150101 { get; set; }
         public Tvq Tvq20150105 { get; set; }

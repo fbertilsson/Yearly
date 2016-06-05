@@ -43,11 +43,12 @@ namespace YearlyWeb2.Controllers
             var tsWithRegisterEntries = new Timeseries();
             tsWithRegisterEntries.AddRange(sortedTvqs.ToList());
 
-            var deltaOperator = new DeltaTsOperator();
-            var tsWithConsumption = deltaOperator.Apply(tsWithRegisterEntries);
-
             var periodizer = new Periodizer();
-            var monthlyAverages = periodizer.MonthlyAverage(tsWithConsumption);
+            var monthlyRegisterEntries = periodizer.MonthlyAverage(tsWithRegisterEntries);
+
+            var deltaOperator = new DeltaTsOperator();
+            var monthlyAverages = deltaOperator.Apply(monthlyRegisterEntries);
+
             return monthlyAverages;
         }
 

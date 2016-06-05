@@ -8,7 +8,7 @@ namespace Periodic.Algo
     {
         public Tvq Apply(DateTime t0, DateTime t1, Timeseries ts)
         {
-            double v0 = 0; // Value at start of period. Zero if first tvq.Time > t0
+            double v0 = 0; 
             Tvq current = null;
             int i;
             int currentIndex = 0;
@@ -18,6 +18,7 @@ namespace Periodic.Algo
                 current = ts[currentIndex];
                 if (current.Time > t0)
                 {
+                    v0 = current.V; // Value at start of period if first tvq.Time > t0
                     break;
                 }
                 v0 = current.V;
