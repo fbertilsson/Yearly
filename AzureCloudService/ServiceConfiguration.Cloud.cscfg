@@ -4,7 +4,7 @@
     <Instances count="1" />
     <ConfigurationSettings>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=fbmetering;AccountKey=YbxfAhuYLYOnAKMm0pEhLkhYX0VzokUMBGks7x9p3Lt3gDiBSuXh6Vb+pTCgZ1ZY/QnKcVquJ7BLrcjOLY6mKg==" />
-      <Setting name="StorageConnectionString" value="this value is replaced in Azure" />
+      <Setting name="StorageConnectionString" value="DefaultEndpointsProtocol=https;AccountName=x;AccountKey=x" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
