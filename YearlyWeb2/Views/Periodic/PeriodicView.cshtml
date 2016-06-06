@@ -6,7 +6,9 @@
 
 <h2>Månatlig förbrukning</h2>
 
-<div id="graphdiv"></div>
+<div
+    id="graphdiv" 
+    style="width: 100%; height: 400px; margin-bottom: 2em;"></div>
 
 <table class="table">
     <tr>
@@ -53,7 +55,8 @@
               highlightCircleSize: 5
           },
           xlabel: 'Månad',
-          ylabel: 'kWh'
+          ylabel: 'kWh',
+          includeZero: true
       }
   );
 </script>
