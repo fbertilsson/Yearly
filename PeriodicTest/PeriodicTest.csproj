@@ -80,6 +80,7 @@
     <Compile Include="Algo\AverageTest.cs" />
     <Compile Include="Algo\DeltaTsOperatorTest.cs" />
     <Compile Include="Algo\DeltaTvqOperatorTest.cs" />
+    <Compile Include="MonthlyValueTextRendererTest.cs" />
     <Compile Include="PeriodizerTest.cs" />
     <Compile Include="SplitterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

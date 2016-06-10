@@ -25,8 +25,7 @@ namespace Periodic
         {
             WriteSeriesHeaders(splitPerYear, writer);
 
-            var maxEntries = splitPerYear.Max(x => x.Count);
-            for (var i = 0; i < maxEntries; i++)
+            for (var i = 0; i < 12; i++)
             {
                 var monthNumber = i + 1;
                 WriteRowHeader(monthNumber, writer);
