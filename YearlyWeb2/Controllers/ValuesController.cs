@@ -21,8 +21,7 @@ namespace YearlyWeb2.Controllers
         public string MonthlyValues(string registerId)
         {
             var monthlyAverages = GetMonthlyAverages(registerId);
-            var tsMonthly = new Periodizer().MonthlyAverage(monthlyAverages);
-            var splitPerYear = new Splitter().SplitPerYear(tsMonthly);
+            var splitPerYear = new Splitter().SplitPerYear(monthlyAverages);
 
             var writer = new StringWriter();
             var renderer = new MonthlyValueTextRenderer(CultureInfo.InvariantCulture);
