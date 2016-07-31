@@ -1,0 +1,39 @@
+﻿@model Periodic.Ts.Timeseries
+
+@{
+    ViewBag.Title = "Mätarställningar";
+}
+
+<h2>@ViewBag.Title</h2>
+<table class="table">
+    <tr>
+        <th>Tidpunkt</th>
+        <th>Mätarställning</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Time)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.V)
+            </td>
+            <td>
+                @using (Html.BeginForm("DeleteRegistryEntry", "RegisterEntry", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("dateString", item.Time.ToString("O"))
+                    <input type="submit" role="button" value="Radera" class="btn"/>
+                }
+            </td>
+        </tr>
+    }
+</table>
+
+<div>
+    @Html.ActionLink("Tillbaka", "Index", "Home")
+</div>
+
+
