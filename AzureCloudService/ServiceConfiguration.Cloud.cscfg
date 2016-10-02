@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ServiceConfiguration serviceName="AzureCloudService" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="4" osVersion="*" schemaVersion="2015-04.2.6">
-  <Role name="YearlyWeb2">
+  <Role name="YearlyWeb3">
     <Instances count="1" />
     <ConfigurationSettings>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=fbmetering;AccountKey=YbxfAhuYLYOnAKMm0pEhLkhYX0VzokUMBGks7x9p3Lt3gDiBSuXh6Vb+pTCgZ1ZY/QnKcVquJ7BLrcjOLY6mKg==" />
       <Setting name="StorageConnectionString" value="DefaultEndpointsProtocol=https;AccountName=x;AccountKey=x" />
-    </ConfigurationSettings>
-  </Role>
-  <Role name="YearlyWeb3">
-    <Instances count="1" />
-    <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
-      <Setting name="StorageConnectionString" value="DefaultEndpointsProtocol=https;AccountName=x;AccountKey=x" />
       <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" value="32bd261a-5b39-4f23-bf57-3223a888f80f" />
     </ConfigurationSettings>
+    <Certificates>
+      <Certificate name="fbmetering.azurewebsites.net" thumbprint="E78ABAE0A2E352D13687EF88A6C2E21B1A1D2297" thumbprintAlgorithm="sha1" />
+    </Certificates>
   </Role>
 </ServiceConfiguration>

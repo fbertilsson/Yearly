@@ -1,24 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ServiceDefinition name="AzureCloudService" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition" schemaVersion="2015-04.2.6">
-  <WebRole name="YearlyWeb2" vmsize="Small">
-    <Sites>
-      <Site name="Web">
-        <Bindings>
-          <Binding name="Endpoint1" endpointName="Endpoint1" />
-        </Bindings>
-      </Site>
-    </Sites>
-    <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
-      <Setting name="StorageConnectionString" />
-    </ConfigurationSettings>
-    <Endpoints>
-      <InputEndpoint name="Endpoint1" protocol="http" port="8080" />
-    </Endpoints>
-    <LocalResources>
-      <LocalStorage name="LocalStorage1" cleanOnRoleRecycle="false" />
-    </LocalResources>
-  </WebRole>
   <WebRole name="YearlyWeb3" vmsize="Small">
     <Sites>
       <Site name="Web">
@@ -33,10 +14,13 @@
       <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" />
     </ConfigurationSettings>
     <Endpoints>
-      <InputEndpoint name="Endpoint1" protocol="https" port="443" />
+      <InputEndpoint name="Endpoint1" protocol="https" port="443" certificate="fbmetering.azurewebsites.net" />
     </Endpoints>
     <LocalResources>
       <LocalStorage name="LocalStorage1" cleanOnRoleRecycle="false" />
     </LocalResources>
+    <Certificates>
+      <Certificate name="fbmetering.azurewebsites.net" storeLocation="LocalMachine" storeName="My" />
+    </Certificates>
   </WebRole>
 </ServiceDefinition>

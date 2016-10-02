@@ -37,14 +37,6 @@
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\YearlyWeb2\YearlyWeb2.csproj">
-      <Name>YearlyWeb2</Name>
-      <Project>{af946360-9f15-4297-bf77-201ac5ad3c34}</Project>
-      <Private>True</Private>
-      <RoleType>Web</RoleType>
-      <RoleName>YearlyWeb2</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
-    </ProjectReference>
     <ProjectReference Include="..\YearlyWeb3\YearlyWeb3.csproj">
       <Name>YearlyWeb3</Name>
       <Project>{8ec972a4-9889-47e7-a790-00cffb52edc2}</Project>
