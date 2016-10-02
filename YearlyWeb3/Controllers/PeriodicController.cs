@@ -8,6 +8,7 @@ using YearlyWeb3.DataLayer;
 
 namespace YearlyWeb3.Controllers
 {
+    [Authorize]
     public class PeriodicController : Controller
     {
         public ActionResult PeriodicView()

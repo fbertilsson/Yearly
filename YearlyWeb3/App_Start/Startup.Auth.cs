@@ -5,6 +5,7 @@ using System.IdentityModel.Claims;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.ApplicationInsights;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
@@ -21,7 +22,9 @@ namespace YearlyWeb3
         private string graphResourceID = "https://graph.windows.net";
         private static string aadInstance = ConfigurationManager.AppSettings["ida:AADInstance"];
         private string authority = aadInstance + "common";
-        private ApplicationDbContext db = new ApplicationDbContext();
+        //private ApplicationDbContext db = new ApplicationDbContext();
+
+        private TelemetryClient telemetry = new TelemetryClient();
 
         public void ConfigureAuth(IAppBuilder app)
         {
@@ -55,7 +58,9 @@ namespace YearlyWeb3
                             string tenantID = context.AuthenticationTicket.Identity.FindFirst("http://schemas.microsoft.com/identity/claims/tenantid").Value;
                             string signedInUserID = context.AuthenticationTicket.Identity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-                            AuthenticationContext authContext = new AuthenticationContext(aadInstance + tenantID, new ADALTokenCache(signedInUserID));
+                            // 2016-10-02 Commenting out because the ADALTokenCache threw an exception about empty DB connection string.
+                            // AuthenticationContext authContext = new AuthenticationContext(aadInstance + tenantID, new ADALTokenCache(signedInUserID));
+                            AuthenticationContext authContext = new AuthenticationContext(aadInstance + tenantID);
                             return 
                                 authContext.AcquireTokenByAuthorizationCodeAsync(
                                     code, 
@@ -67,6 +72,7 @@ namespace YearlyWeb3
                         },
                         AuthenticationFailed = (context) =>
                         {
+                            telemetry.TrackException(context.Exception);
                             context.OwinContext.Response.Redirect("/Home/Error");
                             context.HandleResponse(); // Suppress the exception
                             return Task.FromResult(0);

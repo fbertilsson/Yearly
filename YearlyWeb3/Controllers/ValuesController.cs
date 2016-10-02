@@ -13,7 +13,7 @@ using YearlyWeb3.DataLayer;
 
 namespace YearlyWeb3.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class ValuesController : ApiController
     {
         [Route("api/periodic/{registerId}/monthly/csv")]

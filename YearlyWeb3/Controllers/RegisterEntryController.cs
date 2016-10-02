@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Web.Http;
 using System.Web.Mvc;
 using Periodic;
 using YearlyWeb3.Models;
@@ -11,6 +10,7 @@ using YearlyWeb3.DataLayer;
 
 namespace YearlyWeb3.Controllers
 {
+    [Authorize]
     public class RegisterEntryController : Controller
     {
         // GET: RegisterEntry
@@ -122,7 +122,7 @@ namespace YearlyWeb3.Controllers
 
         [System.Web.Mvc.HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteRegistryEntry([FromUri] string dateString)
+        public ActionResult DeleteRegistryEntry([System.Web.Http.FromUri] string dateString)
         {
             DateTime t;
             var ok = DateTime.TryParse(dateString, out t);
