@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Principal;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Periodic.Ts;
@@ -11,12 +12,12 @@ namespace YearlyWeb3.DataLayer
     public class RegistryEntryRepo
     {
         private readonly CloudStorageAccount m_StorageAccount;
-        private string m_PartitionKey;
+        private readonly string m_PartitionKey;
 
-        public RegistryEntryRepo(CloudStorageAccount storageAccount)
+        public RegistryEntryRepo(CloudStorageAccount storageAccount, string partitionKey)
         {
             m_StorageAccount = storageAccount;
-            m_PartitionKey = "fredrik.bertilsson";
+            m_PartitionKey = partitionKey;
         }
 
         public void AddRegistryEntry(Tvq tvq)
@@ -35,7 +36,7 @@ namespace YearlyWeb3.DataLayer
             table.Execute(insertOperation);
         }
 
-        public IEnumerable<Tvq> GetRegistryEntries()
+        public IEnumerable<Tvq> GetRegistryEntries(IPrincipal principal)
         {
             // Create the table client.
             var tableClient = m_StorageAccount.CreateCloudTableClient();

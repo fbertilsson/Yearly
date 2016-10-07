@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Web.Mvc;
 using Periodic;
 using YearlyWeb3.Models;
@@ -63,21 +64,12 @@ namespace YearlyWeb3.Controllers
 
             var tvq = new Tvq(t, v, Quality.Ok);
 
-            var repo = GetRegistryEntryRepo();
+            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
             repo.AddRegistryEntry(tvq);
 
             ViewBag.Title = "Mätarställning registrerad";
             ViewBag.SubTitle = "Mätarställningen blev registrerad";
             return View(model);
-        }
-
-        private RegistryEntryRepo GetRegistryEntryRepo()
-        {
-            var storageAccount = CloudStorageAccount.Parse(
-                CloudConfigurationManager.GetSetting("StorageConnectionString"));
-
-            var repo = new RegistryEntryRepo(storageAccount);
-            return repo;
         }
 
 
@@ -96,7 +88,7 @@ namespace YearlyWeb3.Controllers
         {
             var timeseries = TsParser.ParseTimeseries(model.EntriesString);
 
-            var repo = GetRegistryEntryRepo();
+            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
             foreach (var tvq in timeseries)
             {
                 repo.AddRegistryEntry(tvq);
@@ -110,9 +102,9 @@ namespace YearlyWeb3.Controllers
         [System.Web.Mvc.HttpGet]
         public ActionResult ListEntriesView()
         {
-            var repo = GetRegistryEntryRepo();
+            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
 
-            var entries = repo.GetRegistryEntries();
+            var entries = repo.GetRegistryEntries(Thread.CurrentPrincipal);
             var sortedTvqs = entries.OrderBy(x => x.Time);
             var tsWithRegisterEntries = new Timeseries();
             tsWithRegisterEntries.AddRange(sortedTvqs.ToList());
@@ -133,7 +125,7 @@ namespace YearlyWeb3.Controllers
                 return View("ListEntriesView");
             } // TODO better error handling
 
-            var repo = GetRegistryEntryRepo();
+            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
             ok = repo.DeleteRegistryEntry(t);
             if (!ok)
             {

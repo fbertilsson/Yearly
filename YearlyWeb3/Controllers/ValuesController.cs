@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web.Http;
 using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
@@ -36,8 +37,8 @@ namespace YearlyWeb3.Controllers
             var storageAccount = CloudStorageAccount.Parse(
                 CloudConfigurationManager.GetSetting("StorageConnectionString"));
 
-            var repo = new RegistryEntryRepo(storageAccount);
-            var sortedTvqs = repo.GetRegistryEntries().OrderBy(x => x.Time);
+            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
+            var sortedTvqs = repo.GetRegistryEntries(Thread.CurrentPrincipal).OrderBy(x => x.Time);
 
             var tsWithRegisterEntries = new Timeseries();
             tsWithRegisterEntries.AddRange(sortedTvqs.ToList());

@@ -285,6 +285,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PeriodicController.cs" />
     <Compile Include="Controllers\RegisterEntryController.cs" />
+    <Compile Include="Controllers\RegistryEntryRepoFactory.cs" />
     <Compile Include="Controllers\UserProfileController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="DataLayer\RegistryEntryRepo.cs" />
