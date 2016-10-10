@@ -64,12 +64,20 @@ namespace YearlyWeb3.Controllers
 
             var tvq = new Tvq(t, v, Quality.Ok);
 
-            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
-            repo.AddRegistryEntry(tvq);
-
-            ViewBag.Title = "Mätarställning registrerad";
-            ViewBag.SubTitle = "Mätarställningen blev registrerad";
-            return View(model);
+            try
+            {
+                var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
+                repo.AddRegistryEntry(tvq);
+                ViewBag.Title = "Mätarställning registrerad";
+                ViewBag.SubTitle = "Mätarställningen blev registrerad";
+                return View(model);
+            }
+            catch (Exception e)
+            {
+                ViewBag.Title = "Ett fel uppstod";
+                ViewBag.SubTitle = "Ett fel uppstod vid registrering av mätarställning";
+                return View(model);
+            }
         }
 
 

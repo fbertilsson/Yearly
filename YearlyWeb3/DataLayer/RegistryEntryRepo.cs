@@ -17,7 +17,21 @@ namespace YearlyWeb3.DataLayer
         public RegistryEntryRepo(CloudStorageAccount storageAccount, string partitionKey)
         {
             m_StorageAccount = storageAccount;
-            m_PartitionKey = partitionKey;
+            m_PartitionKey = EnforceNamingRules(partitionKey);
+        }
+
+        /// <summary>
+        /// Transforms a partition key candidate string to a valid string to use for Azure table storage.
+        /// N.B. The number sign '#' is not allowed. 
+        /// <seealso cref="https://msdn.microsoft.com/library/azure/dd179338.aspx"/>
+        /// </summary>
+        /// <param name="partitionKey"></param>
+        /// <returns>A valid partition key</returns>
+        private string EnforceNamingRules(string partitionKey)
+        {
+            return partitionKey
+                .Replace("#", "-n-")
+                .Replace("?", "-q-");
         }
 
         public void AddRegistryEntry(Tvq tvq)
