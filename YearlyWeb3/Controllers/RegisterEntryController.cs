@@ -2,18 +2,23 @@
 using System.Linq;
 using System.Threading;
 using System.Web.Mvc;
+using Microsoft.ApplicationInsights;
 using Periodic;
 using YearlyWeb3.Models;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.Azure;
 using Periodic.Ts;
-using YearlyWeb3.DataLayer;
 
 namespace YearlyWeb3.Controllers
 {
     [Authorize]
     public class RegisterEntryController : Controller
     {
+        private readonly TelemetryClient _logger;
+
+        public RegisterEntryController()
+        {
+            _logger = new TelemetryClient();
+        }
+
         // GET: RegisterEntry
         public ActionResult RegisterEntryView()
         {
@@ -33,39 +38,39 @@ namespace YearlyWeb3.Controllers
         [System.Web.Mvc.HttpPost]
         public ActionResult SubmitRegisterEntry(RegisterEntryModel model)
         {
-            bool ok;
-            DateTime t;
-            int v;
-            ok = DateTime.TryParse(model.DateString, out t);
-            if (!ok)
-            {
-                ViewBag.Title = "Fel vid registrering";
-                ViewBag.SubTitle = "Datum kunde ej tolkas";
-                return View(model);
-            } // TODO better error handling
-
-            ok = int.TryParse(model.RegisterValue, out v);
-            if (!ok)
-            {
-                ViewBag.Title = "Fel vid registrering";
-                ViewBag.SubTitle = "Mätarställning kunde ej tolkas";
-                return View(model);
-            } // TODO better error handling
-
-            var now = DateTime.Now;
-            var isToday =
-                t.Year == now.Year
-                && t.Month == now.Month
-                && t.Day == now.Day;
-            if (isToday)
-            {
-                t = now;
-            }
-
-            var tvq = new Tvq(t, v, Quality.Ok);
-
             try
             {
+                bool ok;
+                DateTime t;
+                int v;
+                ok = DateTime.TryParse(model.DateString, out t);
+                if (!ok)
+                {
+                    ViewBag.Title = "Fel vid registrering";
+                    ViewBag.SubTitle = "Datum kunde ej tolkas";
+                    return View(model);
+                } // TODO better error handling
+
+                ok = int.TryParse(model.RegisterValue, out v);
+                if (!ok)
+                {
+                    ViewBag.Title = "Fel vid registrering";
+                    ViewBag.SubTitle = "Mätarställning kunde ej tolkas";
+                    return View(model);
+                } // TODO better error handling
+
+                var now = DateTime.Now;
+                var isToday =
+                    t.Year == now.Year
+                    && t.Month == now.Month
+                    && t.Day == now.Day;
+                if (isToday)
+                {
+                    t = now;
+                }
+
+                var tvq = new Tvq(t, v, Quality.Ok);
+
                 var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
                 repo.AddRegistryEntry(tvq);
                 ViewBag.Title = "Mätarställning registrerad";
@@ -74,6 +79,7 @@ namespace YearlyWeb3.Controllers
             }
             catch (Exception e)
             {
+                _logger.TrackException(e);
                 ViewBag.Title = "Ett fel uppstod";
                 ViewBag.SubTitle = "Ett fel uppstod vid registrering av mätarställning";
                 return View(model);
@@ -94,30 +100,46 @@ namespace YearlyWeb3.Controllers
         [System.Web.Mvc.HttpPost]
         public ActionResult SubmitRegisterEntries(RegisterEntriesModel model)
         {
-            var timeseries = TsParser.ParseTimeseries(model.EntriesString);
-
-            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
-            foreach (var tvq in timeseries)
+            try
             {
-                repo.AddRegistryEntry(tvq);
-            }
+                var timeseries = TsParser.ParseTimeseries(model.EntriesString);
 
-            ViewBag.Title = "Mätarställningar registrerade";
-            ViewBag.SubTitle = "Mätarställningarna blev registrerade";
-            return View(model);
+                var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
+                foreach (var tvq in timeseries)
+                {
+                    repo.AddRegistryEntry(tvq);
+                }
+
+                ViewBag.Title = "Mätarställningar registrerade";
+                ViewBag.SubTitle = "Mätarställningarna blev registrerade";
+                return View(model);
+            }
+            catch (Exception e)
+            {
+                _logger.TrackException(e);
+                return View("Error");
+            }
         }
 
         [System.Web.Mvc.HttpGet]
         public ActionResult ListEntriesView()
         {
-            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
+            try
+            {
+                var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
 
-            var entries = repo.GetRegistryEntries(Thread.CurrentPrincipal);
-            var sortedTvqs = entries.OrderBy(x => x.Time);
-            var tsWithRegisterEntries = new Timeseries();
-            tsWithRegisterEntries.AddRange(sortedTvqs.ToList());
+                var entries = repo.GetRegistryEntries(Thread.CurrentPrincipal);
+                var sortedTvqs = entries.OrderBy(x => x.Time);
+                var tsWithRegisterEntries = new Timeseries();
+                tsWithRegisterEntries.AddRange(sortedTvqs.ToList());
 
-            return View(tsWithRegisterEntries);
+                return View(tsWithRegisterEntries);
+            }
+            catch (Exception e)
+            {
+                _logger.TrackException(e);
+                return View("Error");
+            }
         }
 
         [System.Web.Mvc.HttpPost]
