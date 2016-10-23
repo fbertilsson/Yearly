@@ -1,10 +1,4 @@
-﻿using System.IO;
-using System.Web.Mvc;
-using System.Linq;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage;
-using Periodic;
-using YearlyWeb3.DataLayer;
+﻿using System.Web.Mvc;
 
 namespace YearlyWeb3.Controllers
 {
@@ -13,13 +7,17 @@ namespace YearlyWeb3.Controllers
     {
         public ActionResult PeriodicView()
         {
-            string dummyRegisterid = string.Empty;
-            var monthlyAverages = ValuesController.GetMonthlyAverages(dummyRegisterid);
-
-            return View(monthlyAverages);
+            try
+            {
+                var monthlyAverages = ValuesController.GetMonthlyAverages();
+                return View(monthlyAverages);
+            }
+            catch (TooFewEntriesException tfe)
+            {
+                ViewBag.Title = "För få värden";
+                ViewBag.Message = $"Det behövs värden i minst {tfe.MinEntries} månader för att jämföra månatligt.";
+                return View("Error");
+            }
         }
-
-
-
     }
 }

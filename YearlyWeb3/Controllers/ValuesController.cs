@@ -5,12 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Web.Http;
-using Microsoft.Azure;
-using Microsoft.WindowsAzure.Storage;
 using Periodic;
 using Periodic.Algo;
 using Periodic.Ts;
-using YearlyWeb3.DataLayer;
 
 namespace YearlyWeb3.Controllers
 {
@@ -19,9 +16,9 @@ namespace YearlyWeb3.Controllers
     {
         [Route("api/periodic/{registerId}/monthly/csv")]
         [HttpGet]
-        public string MonthlyValues(string registerId)
+        public string MonthlyValues()
         {
-            var monthlyAverages = GetMonthlyAverages(registerId);
+            var monthlyAverages = GetMonthlyAverages();
             var splitPerYear = new Splitter().SplitPerYear(monthlyAverages);
 
             var writer = new StringWriter();
@@ -32,11 +29,8 @@ namespace YearlyWeb3.Controllers
         }
 
 
-        public static Timeseries GetMonthlyAverages(string registerId)
+        public static Timeseries GetMonthlyAverages()
         {
-            var storageAccount = CloudStorageAccount.Parse(
-                CloudConfigurationManager.GetSetting("StorageConnectionString"));
-
             var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
             var sortedTvqs = repo.GetRegistryEntries(Thread.CurrentPrincipal).OrderBy(x => x.Time);
 
@@ -45,6 +39,14 @@ namespace YearlyWeb3.Controllers
 
             var periodizer = new Periodizer();
             var monthlyRegisterEntries = periodizer.MonthlyAverage(tsWithRegisterEntries);
+
+            const int minMonths = 2;
+            var tooFewEntries = monthlyRegisterEntries.Count < minMonths;
+            var areTooFewEntries = tooFewEntries;
+            if (areTooFewEntries)
+            {
+                throw new TooFewEntriesException(minMonths);
+            }
 
             var deltaOperator = new DeltaTsOperator();
             var monthlyAverages = deltaOperator.Apply(monthlyRegisterEntries);

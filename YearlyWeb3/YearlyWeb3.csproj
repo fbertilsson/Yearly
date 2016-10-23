@@ -286,6 +286,7 @@
     <Compile Include="Controllers\PeriodicController.cs" />
     <Compile Include="Controllers\RegisterEntryController.cs" />
     <Compile Include="Controllers\RegistryEntryRepoFactory.cs" />
+    <Compile Include="Controllers\TooFewEntriesException.cs" />
     <Compile Include="Controllers\UserProfileController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="DataLayer\RegistryEntryRepo.cs" />
@@ -372,6 +373,7 @@
     <Content Include="Views\RegisterEntry\SubmitRegisterEntries.cshtml" />
     <Content Include="Views\RegisterEntry\SubmitRegisterEntry.cshtml" />
     <Content Include="Views\Home\Error.cshtml" />
+    <Content Include="Views\Periodic\Error.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
