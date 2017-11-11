@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Web.Http;
 using Periodic;
@@ -16,7 +19,7 @@ namespace YearlyWeb3.Controllers
     {
         [Route("api/periodic/{registerId}/monthly/csv")]
         [HttpGet]
-        public string MonthlyValues()
+        public HttpResponseMessage MonthlyValues()
         {
             var monthlyAverages = GetMonthlyAverages();
             var splitPerYear = new Splitter().SplitPerYear(monthlyAverages);
@@ -24,8 +27,14 @@ namespace YearlyWeb3.Controllers
             var writer = new StringWriter();
             var renderer = new MonthlyValueTextRenderer(CultureInfo.InvariantCulture);
             renderer.Render(splitPerYear, writer);
-
-            return writer.ToString();
+            
+            var result = writer.ToString();
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(result)
+            };
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+            return response;
         }
 
 
