@@ -64,7 +64,9 @@ namespace YearlyWeb3.Controllers
                     t.Year == now.Year
                     && t.Month == now.Month
                     && t.Day == now.Day;
-                if (isToday)
+
+                var isMidnight = t.Hour == 0 && t.Minute == 0;
+                if (isToday && isMidnight)
                 {
                     t = now;
                 }
