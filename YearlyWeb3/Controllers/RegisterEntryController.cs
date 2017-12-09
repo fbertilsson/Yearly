@@ -26,9 +26,10 @@ namespace YearlyWeb3.Controllers
             ViewBag.SubTitle = "Registrera aktuell mätarställning";
             ViewBag.Action = "Registrera";
 
+            var now = DateTime.Now;
             var model = new RegisterEntryModel
             {
-                DateString = DateTime.Now.ToShortDateString(),
+                DateString = $"{now.ToShortDateString()} {now.ToShortTimeString()}",
                 RegisterValue = string.Empty,
             };
 

@@ -4,7 +4,7 @@ namespace YearlyWeb3.Models
 {
     public class RegisterEntryModel
     {
-        [DisplayName("Datum")]
+        [DisplayName("Tidpunkt")]
         public string DateString { get; set; }
         
         /// <summary>
