@@ -21,7 +21,7 @@ namespace YearlyWeb3.Controllers
         [HttpGet]
         public HttpResponseMessage MonthlyValues()
         {
-            var monthlyAverages = GetMonthlyAverages();
+            var monthlyAverages = GetMonthlyAverages(); // Ignoring the registerId parameter for now
             var splitPerYear = new Splitter().SplitPerYear(monthlyAverages);
 
             var writer = new StringWriter();
