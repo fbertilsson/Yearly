@@ -1,7 +1,7 @@
 <div class="registerentry-main">
     <div class="form-horizontal">
         <h2>Registrera mätarställning</h2>
-        <form action="/RegisterEntry/SubmitRegisterEntry" method="Post">
+        <form action="/RegisterEntry/SubmitRegisterEntry" #registerEntryForm="ngForm">
             <!--@Html.ValidationSummary(true, "", new { @class = "text-danger" })-->
             <div class="form-group">
                 <label for="DateString" class="control-label">Tidpunkt</label>
@@ -12,7 +12,8 @@
                            name="DateString" 
                            id="DateString" 
                            class="form-control"
-                           type="text"/>
+                           type="text"
+                           required/>
                     <!--TODO @Html.ValidationMessageFor(model => model.DateString, "", new { @class = "text-danger" })-->
                 </div>
             </div>
@@ -29,7 +30,8 @@
                            class="form-control"
                            type="number"
                            pattern="[0-9]*"
-                           autocomplete="off" />
+                           autocomplete="off"
+                           required/>
                     <!--TODO @Html.ValidationMessageFor(model => model.RegisterValue, "", new { @class = "text-danger" })-->
                 </div>
             </div>
