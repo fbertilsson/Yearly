@@ -1,0 +1,44 @@
+<div class="registerentry-main">
+    <div class="form-horizontal">
+        <h2>Registrera mätarställning</h2>
+        <form action="/RegisterEntry/SubmitRegisterEntry" method="Post">
+            <!--@Html.ValidationSummary(true, "", new { @class = "text-danger" })-->
+            <div class="form-group">
+                <label for="DateString" class="control-label">Tidpunkt</label>
+                <!--@Html.LabelFor(model => model.DateString, htmlAttributes: new { @class = "control-label col-md-2" })-->
+                <div class="col-md-2">
+                    <input [(ngModel)]="registerEntry.dateString" 
+                           placeholder="Tidpunkt"
+                           name="DateString" 
+                           id="DateString" 
+                           class="form-control"
+                           type="text"/>
+                    <!--TODO @Html.ValidationMessageFor(model => model.DateString, "", new { @class = "text-danger" })-->
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="RegisterValue" class="control-label">Mätarställning</label>
+                <!--@Html.LabelFor(model => model.RegisterValue, htmlAttributes: new { @class = "control-label col-md-2" })-->
+                <div class="col-md-2">
+                    <!-- On numeric input: https://www.filamentgroup.com/lab/type-number.html -->
+                    <input [(ngModel)]="registerEntry.registerValue"
+                           placeholder="Mätarställning"
+                           name="RegisterValue"
+                           id="RegisterValue"
+                           class="form-control"
+                           type="number"
+                           pattern="[0-9]*"
+                           autocomplete="off" />
+                    <!--TODO @Html.ValidationMessageFor(model => model.RegisterValue, "", new { @class = "text-danger" })-->
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="col-md-2">
+                    <button (click)="add(registerEntry)" class="btn btn-default">Registrera</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

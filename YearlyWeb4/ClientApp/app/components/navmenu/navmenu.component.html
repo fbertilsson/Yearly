@@ -7,14 +7,19 @@
                 <span class='icon-bar'></span>
                 <span class='icon-bar'></span>
             </button>
-            <a class='navbar-brand' [routerLink]="['/home']">YearlyWeb4</a>
+            <a class='navbar-brand' [routerLink]="['/home']">Elförbrukning</a>
         </div>
         <div class='clearfix'></div>
         <div class='navbar-collapse collapse'>
             <ul class='nav navbar-nav'>
                 <li [routerLinkActive]="['link-active']">
                     <a [routerLink]="['/home']">
-                        <span class='glyphicon glyphicon-home'></span> Home
+                        <span class='glyphicon glyphicon-home'></span> Hem
+                    </a>
+                </li>
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/registerentry']">
+                        <span class='glyphicon glyphicon-education'></span> Registrera mätarställning
                     </a>
                 </li>
                 <li [routerLinkActive]="['link-active']">
