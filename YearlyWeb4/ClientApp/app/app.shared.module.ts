@@ -10,6 +10,7 @@ import { HomeComponent } from './components/home/home.component';
 import { FetchDataComponent } from './components/fetchdata/fetchdata.component';
 import { CounterComponent } from './components/counter/counter.component';
 import { RegisterEntryComponent } from './components/registerentry/registerentry.component';
+import { SenderService } from './components/registerentry/sender.service';
 
 @NgModule({
     declarations: [
@@ -31,7 +32,10 @@ import { RegisterEntryComponent } from './components/registerentry/registerentry
             { path: 'counter', component: CounterComponent },
             { path: 'fetch-data', component: FetchDataComponent },
             { path: '**', redirectTo: 'home' }
-        ])
+        ]),
+    ],
+    providers: [
+        SenderService
     ]
 })
 export class AppModuleShared {

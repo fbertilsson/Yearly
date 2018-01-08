@@ -1,5 +1,6 @@
 ﻿import { Component } from '@angular/core';
 import { RegisterEntry } from './registerentry';
+import { SenderService } from './sender.service';
 
 @Component({
     selector: 'reg-entry',
@@ -12,9 +13,13 @@ export class RegisterEntryComponent {
         registerValue: ''
     }
 
-    constructor() {}
+    constructor(
+        private sender: SenderService) {}
 
     add(registerEntry: RegisterEntry) {
         console.log('Add ' + registerEntry.dateString + ' ' + registerEntry.registerValue);
+        this.sender.send(
+                registerEntry)
+            .subscribe(x => console.log(x));
     }
 }
