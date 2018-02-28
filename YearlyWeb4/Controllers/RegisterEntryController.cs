@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Periodic.Ts;
 
 namespace YearlyWeb4.Controllers
 {
@@ -11,6 +13,12 @@ namespace YearlyWeb4.Controllers
     [Route("api/RegisterEntry")]
     public class RegisterEntryController : Controller
     {
+        public IConfiguration Configuration { get; }
+
+        public RegisterEntryController(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
 
         [HttpPost("SubmitRegisterEntry")]
         public IActionResult  SubmitRegisterEntry([FromBody] RegisterEntryModel model)
@@ -50,13 +58,12 @@ namespace YearlyWeb4.Controllers
                 //}
 
                 // TODO implement:
-                //var tvq = new Tvq(t, v, Quality.Ok);
+                var tvq = new Tvq(t, v, Quality.Ok);
 
-                //var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
-                //repo.AddRegistryEntry(tvq);
+                var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo(Configuration);
+                repo.AddRegistryEntry(tvq);
                 ViewBag.Title = "Mätarställning registrerad";
                 ViewBag.SubTitle = "Mätarställningen blev registrerad";
-                return Ok(model);
             }
             catch (Exception e)
             {
@@ -65,7 +72,7 @@ namespace YearlyWeb4.Controllers
                 ViewBag.SubTitle = "Ett fel uppstod vid registrering av mätarställning";
                 return StatusCode(500);
             }
-            return Ok("I returned");
+            return Ok(model);
         }
     }
 
