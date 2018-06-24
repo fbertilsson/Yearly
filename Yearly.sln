@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yearly", "Yearly\Yearly.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Periodic", "Periodic\Periodic.csproj", "{DD5F9E94-0015-464F-8485-220578D0D0E4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PeriodicTest", "PeriodicTest\PeriodicTest.csproj", "{DC3DF439-2CC5-4560-96B2-23CF23C030AA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YearlyWeb2", "YearlyWeb2\YearlyWeb2.csproj", "{AF946360-9F15-4297-BF77-201AC5AD3C34}"
 EndProject
 Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "AzureCloudService", "AzureCloudService\AzureCloudService.ccproj", "{0650A559-459F-4A4B-BFD3-582659EB50F8}"
@@ -18,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YearlyWeb3Test", "YearlyWeb3Test\YearlyWeb3Test.csproj", "{329318D7-CA59-44F7-9BD9-E494F0A51B81}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YearlyWeb4", "YearlyWeb4\YearlyWeb4.csproj", "{1703BB6B-02CE-402E-8638-8B65A2E09163}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeriodicTest", "PeriodicTest\PeriodicTest.csproj", "{FB73A300-A1FE-4780-ABF2-3AB3B78933ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,14 +43,6 @@ Global
 		{DD5F9E94-0015-464F-8485-220578D0D0E4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DD5F9E94-0015-464F-8485-220578D0D0E4}.Release|x86.ActiveCfg = Release|Any CPU
 		{DD5F9E94-0015-464F-8485-220578D0D0E4}.Release|x86.Build.0 = Release|Any CPU
-		{DC3DF439-2CC5-4560-96B2-23CF23C030AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC3DF439-2CC5-4560-96B2-23CF23C030AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DC3DF439-2CC5-4560-96B2-23CF23C030AA}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DC3DF439-2CC5-4560-96B2-23CF23C030AA}.Debug|x86.Build.0 = Debug|Any CPU
-		{DC3DF439-2CC5-4560-96B2-23CF23C030AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC3DF439-2CC5-4560-96B2-23CF23C030AA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DC3DF439-2CC5-4560-96B2-23CF23C030AA}.Release|x86.ActiveCfg = Release|Any CPU
-		{DC3DF439-2CC5-4560-96B2-23CF23C030AA}.Release|x86.Build.0 = Release|Any CPU
 		{AF946360-9F15-4297-BF77-201AC5AD3C34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AF946360-9F15-4297-BF77-201AC5AD3C34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF946360-9F15-4297-BF77-201AC5AD3C34}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -91,6 +83,14 @@ Global
 		{1703BB6B-02CE-402E-8638-8B65A2E09163}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1703BB6B-02CE-402E-8638-8B65A2E09163}.Release|x86.ActiveCfg = Release|Any CPU
 		{1703BB6B-02CE-402E-8638-8B65A2E09163}.Release|x86.Build.0 = Release|Any CPU
+		{FB73A300-A1FE-4780-ABF2-3AB3B78933ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB73A300-A1FE-4780-ABF2-3AB3B78933ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB73A300-A1FE-4780-ABF2-3AB3B78933ED}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FB73A300-A1FE-4780-ABF2-3AB3B78933ED}.Debug|x86.Build.0 = Debug|Any CPU
+		{FB73A300-A1FE-4780-ABF2-3AB3B78933ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB73A300-A1FE-4780-ABF2-3AB3B78933ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB73A300-A1FE-4780-ABF2-3AB3B78933ED}.Release|x86.ActiveCfg = Release|Any CPU
+		{FB73A300-A1FE-4780-ABF2-3AB3B78933ED}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

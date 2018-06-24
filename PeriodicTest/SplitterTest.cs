@@ -33,7 +33,7 @@ namespace PeriodicTest
 
             var result = m_Periodizer.SplitPerYear(source).ToList();
 
-            Assert.Equal(1, result.Count);            
+            Assert.Single(result);            
         }
 
         [Fact]
@@ -45,8 +45,8 @@ namespace PeriodicTest
             var result = m_Periodizer.SplitPerYear(source).ToList();
 
             Assert.Equal(2, result.Count);
-            Assert.Equal(1, result[0].Count);
-            Assert.Equal(1, result[1].Count);
+            Assert.Single(result[0]);
+            Assert.Single(result[1]);
             Assert.Equal(m_Tvqs.Tvq20150101, result[0].First());
             Assert.Equal(m_Tvqs.Tvq20160101, result[1].First());
         }
@@ -59,7 +59,7 @@ namespace PeriodicTest
 
             var result = m_Periodizer.SplitPerYear(source).ToList();
 
-            Assert.Equal(1, result.Count);
+            Assert.Single(result);
             Assert.Equal(2, result[0].Count);
             Assert.Equal(m_Tvqs.Tvq20150101, result[0][0]);
             Assert.Equal(m_Tvqs.Tvq20150601, result[0][1]);
