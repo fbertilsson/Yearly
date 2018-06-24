@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using YearlyWeb3;
 using YearlyWeb3.Controllers;
 
 namespace YearlyWeb3Test.Controllers
