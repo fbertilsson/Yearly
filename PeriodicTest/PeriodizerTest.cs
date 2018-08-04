@@ -39,6 +39,25 @@ namespace PeriodicTest
         }
 
         [Fact]
+        public void InsertPoints_WhenMonthOnePointAtStart_InsertsEndpointAtLastSecond()
+        {
+            var ts = new Timeseries {m_Tvqs.Tvq20150101};
+            var result = m_Periodizer.InsertPoints(ts, Interval.Month);
+            var tvq = result.Last();
+            Assert.Equal(new DateTime(2015, 01, 31, 23, 59, 59), tvq.Time);
+        }
+        
+        [Fact]
+        public void InsertPoints_WhenMonthOnePointAtStart_InsertsEndpointWithSameValueAsInterpolated()
+        {
+            var ts = new Timeseries { m_Tvqs.Tvq20150101 };
+            var result = m_Periodizer.InsertPoints(ts, Interval.Month);
+            var tvq = result.Last();
+            Assert.Equal(ts[0].V, tvq.V);
+            Assert.Equal(Quality.Interpolated, tvq.Q);
+        }
+
+        [Fact]
         public void InsertPoints_WhenOnePointAtStart_InsertsEndpointWithSameValueAsInterpolated()
         {
             var ts = new Timeseries { m_Tvqs.Tvq20150101 };
@@ -55,6 +74,15 @@ namespace PeriodicTest
             var result = m_Periodizer.InsertPoints(ts, Interval.Year);
             var tvq = result.First();
             Assert.Equal(new DateTime(2015, 01, 01, 0, 0, 0), tvq.Time);
+        }
+
+        [Fact]
+        public void InsertPoints_WhenMonthOnePoint_InsertsStartpointAtFirstSecond()
+        {
+            var ts = new Timeseries {m_Tvqs.Tvq20150622};
+            var result = m_Periodizer.InsertPoints(ts, Interval.Month);
+            var tvq = result.First();
+            Assert.Equal(new DateTime(2015, 06, 01, 0, 0, 0), tvq.Time);
         }
 
         [Fact]
@@ -79,6 +107,16 @@ namespace PeriodicTest
         }
 
         [Fact]
+        public void InsertPoints_WhenMonthOnePointAtEnd_DoesNotInsertEndpoint()
+        {
+            var ts = new Timeseries { m_Tvqs.Tvq20150630 };
+            var result = m_Periodizer.InsertPoints(ts, Interval.Month);
+            Assert.Equal(2, result.Count);
+            var tvq = result.Last();
+            Assert.Same(m_Tvqs.Tvq20150630, tvq);
+        }
+        
+        [Fact]
         public void InsertPoints_WhenTwoPointsSameYear_InsertsExtrapolatedEndValue()
         {
             // Arrange
@@ -89,13 +127,37 @@ namespace PeriodicTest
 
             // Assert
             Assert.Equal(3, result.Count);
-            var tvq0 = result[0];
             var dt = result[1].Time - result[0].Time;
             // y = k*x + m
             var k = (m_Tvqs.Tvq20150601.V - m_Tvqs.Tvq20150101.V) / dt.TotalSeconds;
             var t1 = new DateTime(2015, 12, 31, 23, 59, 59);
             var x = (t1 - m_Tvqs.Tvq20150601.Time).TotalSeconds;
             var y = k * x + m_Tvqs.Tvq20150601.V;
+            var tvq = result.Last();
+            Assert.Equal(t1, tvq.Time);
+            Assert.Equal(y, tvq.V);
+            Assert.Equal(Quality.Interpolated, tvq.Q);
+        }
+
+        [Fact]
+        public void InsertPoints_WhenTwoPointsSameMonth_InsertsExtrapolatedEndValue()
+        {
+            // Arrange
+            var tvq1 = m_Tvqs.Tvq20150601;
+            var tvq2 = m_Tvqs.Tvq20150622;
+            var ts = new Timeseries {tvq1, tvq2};
+
+            // Act
+            var result = m_Periodizer.InsertPoints(ts, Interval.Month);
+
+            // Assert
+            Assert.Equal(3, result.Count);
+            var dt = result[1].Time - result[0].Time;
+            // y = k*x + m
+            var k = (tvq2.V - tvq1.V) / dt.TotalSeconds;
+            var t1 = m_Tvqs.Tvq20150630.Time;
+            var x = (t1 - tvq1.Time).TotalSeconds;
+            var y = k * x + tvq1.V;
             var tvq = result.Last();
             Assert.Equal(t1, tvq.Time);
             Assert.Equal(y, tvq.V);

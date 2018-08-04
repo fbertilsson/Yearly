@@ -26,7 +26,7 @@ namespace Periodic
                 var current = ts[i];
                 var isNewInterval = 
                     i == 0 || 
-                    (previous != null && previous.Time.Year != current.Time.Year);
+                    IsNewInterval(previous, current, intervalLength);
 
                 //
                 // Previous interval end?
@@ -34,7 +34,7 @@ namespace Periodic
                 var doInsertPreviousEnd = isNewInterval && previous != null ; // && not last second
                 if (doInsertPreviousEnd)
                 {
-                    var lastSecondOfPrevious = new DateTime(previous.Time.Year, 12, 31, 23, 59, 59);
+                    var lastSecondOfPrevious = LastSecondOfInterval(previous, intervalLength);
                     var tvq = Tvq.CalculateValueAt(lastSecondOfPrevious, previous, current);
                     result.Add(tvq);
                 }
@@ -43,7 +43,7 @@ namespace Periodic
                 // Current interval start?
                 //
                 var t = current.Time;
-                var firstSecond = new DateTime(t.Year, 01, 01, 0, 0, 0);
+                var firstSecond = FirstSecond(t, intervalLength);
                 if (isNewInterval && t > firstSecond)
                 {
                     var newTvq = previous == null ?
@@ -60,7 +60,7 @@ namespace Periodic
             {
                 if (previous != null)
                 {
-                    var lastSecond = new DateTime(previous.Time.Year, 12, 31, 23, 59, 59);
+                    var lastSecond = LastSecondOfInterval(previous, intervalLength);
 
                     var iLast = ts.Count - 1;
                     var lastTvq = ts.Last();
@@ -78,6 +78,48 @@ namespace Periodic
                 }
             }
             return result;
+        }
+
+        public static DateTime FirstSecond(DateTime t, Interval intervalLength)
+        {
+            switch (intervalLength)
+            {
+                case Interval.Year:
+                    return new DateTime(t.Year, 01, 01, 0, 0, 0);
+                case Interval.Month:
+                    return new DateTime(t.Year, t.Month, 01, 0, 0, 0);
+                default:
+                    throw new ArgumentException("Interval not supported", nameof(intervalLength));
+            }
+            
+        }
+
+        public static DateTime LastSecondOfInterval(Tvq tvq, Interval intervalLength)
+        {
+            switch (intervalLength)
+            {
+                case Interval.Year:
+                    return new DateTime(tvq.Time.Year, 12, 31, 23, 59, 59);
+                case Interval.Month:
+                    return new DateTime(tvq.Time.Year, tvq.Time.Month, 
+                        DateTime.DaysInMonth(tvq.Time.Year, tvq.Time.Month), 
+                        23, 59, 59);
+                default:
+                    throw new ArgumentException("Interval not supported", nameof(intervalLength));
+            }
+        }
+
+        public static bool IsNewInterval(Tvq previous, Tvq current, Interval intervalLength)
+        {
+            switch (intervalLength)
+            {
+                case Interval.Year:
+                    return previous != null && previous.Time.Year != current.Time.Year;
+                case Interval.Month:
+                    return previous != null && previous.Time.Month != current.Time.Month;
+                default:
+                    throw new ArgumentException("Interval not supported", nameof(intervalLength));
+            }
         }
 
         /// <summary>

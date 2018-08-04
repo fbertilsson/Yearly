@@ -1,5 +1,4 @@
-﻿using Periodic;
-using System;
+﻿using System;
 using Periodic.Ts;
 
 namespace PeriodicTest
@@ -11,6 +10,8 @@ namespace PeriodicTest
         public Tvq Tvq20150110 { get; set; }
         public Tvq Tvq20150131 { get; set; }
         public Tvq Tvq20150601 { get; set; }
+        public Tvq Tvq20150622 { get; set; }
+        public Tvq Tvq20150630 { get; set; }
         public Tvq Tvq20150701 { get; set; }
         public Tvq Tvq20151231 { get; set; }
         public Tvq Tvq20160101 { get; set; }
@@ -30,6 +31,10 @@ namespace PeriodicTest
             Tvq20150131 = new Tvq(t, 105, Quality.Ok);
             t = new DateTime(2015, 06, 01, 0, 0, 0, 0);
             Tvq20150601 = new Tvq(t, 200, Quality.Ok);
+            t = new DateTime(2015, 06, 22, 0, 0, 0, 0);
+            Tvq20150622 = new Tvq(t, 222, Quality.Ok);
+            t = new DateTime(2015, 06, 30, 23, 59, 59);
+            Tvq20150630 = new Tvq(t, 230, Quality.Ok);
             t = new DateTime(2015, 07, 01, 0, 0, 0, 0);
             Tvq20150701 = new Tvq(t, 300, Quality.Ok);
             t = new DateTime(2015, 12, 31, 23, 59, 59);
@@ -43,6 +48,5 @@ namespace PeriodicTest
             t = new DateTime(2017, 06, 01, 0, 0, 0, 0);
             Tvq20170601 = new Tvq(t, 500, Quality.Ok);
         }
-
     }
 }
