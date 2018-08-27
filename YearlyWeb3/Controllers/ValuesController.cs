@@ -47,18 +47,18 @@ namespace YearlyWeb3.Controllers
             tsWithRegisterEntries.AddRange(sortedTvqs.ToList());
 
             var periodizer = new Periodizer();
-            var monthlyRegisterEntries = periodizer.MonthlyAverage(tsWithRegisterEntries);
+            var monthlyAverages = periodizer.MonthlyAverage(tsWithRegisterEntries);
 
-            const int minMonths = 2;
-            var tooFewEntries = monthlyRegisterEntries.Count < minMonths;
-            var areTooFewEntries = tooFewEntries;
-            if (areTooFewEntries)
-            {
-                throw new TooFewEntriesException(minMonths);
-            }
+            //const int minMonths = 2;
+            //var tooFewEntries = monthlyRegisterEntries.Count < minMonths;
+            //var areTooFewEntries = tooFewEntries;
+            //if (areTooFewEntries)
+            //{
+            //    throw new TooFewEntriesException(minMonths);
+            //}
 
-            var deltaOperator = new DeltaTsOperator();
-            var monthlyAverages = deltaOperator.Apply(monthlyRegisterEntries);
+            //var deltaOperator = new DeltaTsOperator();
+            //var monthlyAverages = deltaOperator.Apply(monthlyRegisterEntries);
 
             return monthlyAverages;
         }

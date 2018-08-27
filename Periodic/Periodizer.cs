@@ -15,12 +15,18 @@ namespace Periodic
         /// <param name="ts"></param>
         /// <param name="intervalLength"></param>
         /// <returns>A new timeseries that has values at the start and end of the interval</returns>
+        /// <example>
+        /// TODO FB  
+        /// </example>
         public Timeseries InsertPoints(Timeseries ts, Interval intervalLength)
         {
             if (ReferenceEquals(ts, null)) throw new ArgumentException("ts");
 
             var result = new Timeseries();
             Tvq previous = null;
+            // Maybe try a while loop instead that moves the time forwards by the smaller of
+            // * the next TVQ
+            // * the next interval
             for (var i = 0; i < ts.Count; i++)
             {
                 var current = ts[i];
@@ -116,7 +122,11 @@ namespace Periodic
                 case Interval.Year:
                     return previous != null && previous.Time.Year != current.Time.Year;
                 case Interval.Month:
-                    return previous != null && previous.Time.Month != current.Time.Month;
+                    return previous != null && 
+                           (
+                               previous.Time.Year != current.Time.Year  ||
+                               previous.Time.Month != current.Time.Month
+                            );
                 default:
                     throw new ArgumentException("Interval not supported", nameof(intervalLength));
             }
@@ -131,7 +141,11 @@ namespace Periodic
         /// <returns></returns>
         public Timeseries MonthlyAverage(Timeseries ts)
         {
-            var result = new Aggregate().Apply(new Average(), ts);
+            var interpolatedTs = InsertPoints(ts, Interval.Month);
+            var deltaOperator = new DeltaTsOperator();
+            var consumptionTs = deltaOperator.Apply(interpolatedTs);
+
+            var result = new Aggregate().Apply(new Average(), consumptionTs);
             return result;
         }
     }

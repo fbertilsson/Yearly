@@ -211,6 +211,28 @@ namespace PeriodicTest
         }
 
         [Fact]
+        public void InsertPoints_WhenFrom2015To2016_TimesAreCorrect()
+        {
+            // Arrange
+            // Act
+            var ts = new Timeseries
+            {
+                new Tvq(m_Tvqs.Tvq20150601.Time, 4, Quality.Ok),
+                new Tvq(m_Tvqs.Tvq20160601.Time, 4, Quality.Ok)
+            };
+            var averages = m_Periodizer.InsertPoints(ts, Interval.Month);
+
+            // TODO FB.Det här måste skrivas om. Perioderna ska ändras till att vara första och sista s el. ms i perioden.
+            //Assert
+            Assert.Equal(new DateTime(2015, 06, 01, 0, 0, 0), averages[0].Time);
+            Assert.Equal(new DateTime(2015, 06, 30, 23, 59, 59), averages[1].Time);
+            Assert.Equal(new DateTime(2015, 07, 01, 0, 0, 0), averages[2].Time);
+            Assert.Equal(new DateTime(2016, 01, 01, 0, 0, 0), averages[7].Time);
+            Assert.Equal(new DateTime(2016, 06, 01, 0, 0, 0), averages[12].Time);
+        }
+
+
+        [Fact]
         public void MonthlyAverage_WhenNull_ReturnsEmpty()
         {
             Assert.Empty(m_Periodizer.MonthlyAverage(null));
@@ -257,8 +279,8 @@ namespace PeriodicTest
             const double v = 500;
             var ts = new Timeseries
             {
-                new Tvq(m_Tvqs.Tvq20150105.Time, v, Quality.Ok),
-                new Tvq(m_Tvqs.Tvq20150110.Time, 0, Quality.Ok)
+                new Tvq(m_Tvqs.Tvq20150105.Time, 0, Quality.Ok),
+                new Tvq(m_Tvqs.Tvq20150110.Time, v, Quality.Ok)
             };
             var averages = m_Periodizer.MonthlyAverage(ts);
 
@@ -267,6 +289,11 @@ namespace PeriodicTest
             Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
             var area1 = 4 * v;
             var area2 = 5 * v / 2;
+            area1 = 0;
+            var nDaysRising = 31 - 5 + 0;
+            var k = 500d / 5;
+            var endValue = k * nDaysRising;
+            area2 = nDaysRising * endValue / 2;
             var expectedValue = (area1 + area2) / 31;
             Assert.Equal(expectedValue, x.V, 4);
         }
@@ -276,11 +303,11 @@ namespace PeriodicTest
         {
             // Arrange
             // Act
-            const double v = 600;
+            const double v = 0;
             var ts = new Timeseries
             {
                 new Tvq(m_Tvqs.Tvq20150110.Time, v, Quality.Ok),
-                new Tvq(new DateTime(2015, 2, 23, 0, 0, 0), 0, Quality.Ok)
+                new Tvq(new DateTime(2015, 2, 23, 0, 0, 0), 600, Quality.Ok)
             };
             var averages = m_Periodizer.MonthlyAverage(ts);
 
@@ -295,7 +322,7 @@ namespace PeriodicTest
         }
 
         [Fact]
-        public void MonthlyAverage_WhenConstantValueInJanAndFeb_ReturnsIt()
+        public void MonthlyAverage_WhenConstantValueInJanAndFeb_ReturnsZero()
         {
             // Arrange
             // Act
@@ -309,27 +336,30 @@ namespace PeriodicTest
             var averages = m_Periodizer.MonthlyAverage(ts);
 
             //Assert
-            Assert.Equal(v, averages[0].V, 4);
+            Assert.Equal(0, averages[0].V, 4);
         }
 
         [Fact]
-        public void MonthlyAverage_WhenConstantValueInJanAndJune_FebThroughMayAreCorrect()
+        public void MonthlyAverage_WhenConstantConsumptionInJanAndJune_FebThroughMayAreCorrect()
         {
             // Arrange
             // Act
-            const double v = 1000;
+            const double s1 = 1000;
+            const double k = 10d;
+            var nDays = m_Tvqs.Tvq20150601.Time.DayOfYear;
+            var endValue = s1 + nDays * k;
             var ts = new Timeseries
             {
-                new Tvq(m_Tvqs.Tvq20150101.Time, v, Quality.Ok),
-                new Tvq(m_Tvqs.Tvq20150601.Time, v, Quality.Ok)
+                new Tvq(m_Tvqs.Tvq20150101.Time, s1, Quality.Ok),
+                new Tvq(m_Tvqs.Tvq20150601.Time, endValue, Quality.Ok)
             };
             var averages = m_Periodizer.MonthlyAverage(ts);
 
             //Assert
-            Assert.Equal(v, averages[1].V, 4);
-            Assert.Equal(v, averages[2].V, 4);
-            Assert.Equal(v, averages[3].V, 4);
-            Assert.Equal(v, averages[4].V, 4);
+            Assert.Equal(s1 + 31 * k, averages[1].V, 4);
+            Assert.Equal(s1 + (31 + 27) * k, averages[2].V, 4);
+            Assert.Equal(s1 + (31 + 27 + 31) * k, averages[3].V, 4);
+            Assert.Equal(s1 + (31 + 27 + 31 + 30) * k, averages[4].V, 4);
         }
 
         [Fact]
@@ -387,6 +417,12 @@ namespace PeriodicTest
             //Assert
             var average = averages.First(a => a.Time == m_Tvqs.Tvq20160601.Time);
             Assert.Equal(300d, average.V, 0);
+        }
+
+        [Fact]
+        public void IsNewInterval_WhenMonthAndSameMonthDifferentYears_ReturnsTrue()
+        {
+            Assert.True(Periodizer.IsNewInterval(m_Tvqs.Tvq20150601, m_Tvqs.Tvq20160601, Interval.Month));
         }
     }
 }
