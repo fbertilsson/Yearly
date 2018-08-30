@@ -18,6 +18,30 @@ namespace PeriodicTest
         }
 
         [Fact]
+        public void HasEmptyIntervalInBetween_WhenFirstOfJanuaryAndMarch_ReturnsTrue()
+        {
+            Assert.True(m_Periodizer.HasEmptyIntervalInBetween(m_Tvqs.Tvq20150101.Time, m_Tvqs.Tvq20150301.Time, Interval.Month));
+        }
+
+        [Fact]
+        public void HasEmptyIntervalInBetween_WhenLastOfDecemberAndFirstOfMarch_ReturnsTrue()
+        {
+            Assert.True(m_Periodizer.HasEmptyIntervalInBetween(m_Tvqs.Tvq20151231.Time, m_Tvqs.Tvq20160201.Time, Interval.Month));
+        }
+
+        [Fact]
+        public void HasEmptyIntervalInBetween_WhenBothJanuary_ReturnsFalse()
+        {
+            Assert.False(m_Periodizer.HasEmptyIntervalInBetween(m_Tvqs.Tvq20150101.Time, m_Tvqs.Tvq20150105.Time, Interval.Month));
+        }
+
+        [Fact]
+        public void HasEmptyIntervalInBetween_WhenBothDecember_ReturnsFalse()
+        {
+            Assert.False(m_Periodizer.HasEmptyIntervalInBetween(m_Tvqs.Tvq20151201.Time, m_Tvqs.Tvq20151231.Time, Interval.Month));
+        }
+
+        [Fact]
         public void InsertPoints_WhenNullThrowsArgumentException()
         {
             Assert.Throws<ArgumentException>(() => m_Periodizer.InsertPoints(null, Interval.Year));
@@ -222,13 +246,24 @@ namespace PeriodicTest
             };
             var averages = m_Periodizer.InsertPoints(ts, Interval.Month);
 
-            // TODO FB.Det här måste skrivas om. Perioderna ska ändras till att vara första och sista s el. ms i perioden.
             //Assert
-            Assert.Equal(new DateTime(2015, 06, 01, 0, 0, 0), averages[0].Time);
-            Assert.Equal(new DateTime(2015, 06, 30, 23, 59, 59), averages[1].Time);
-            Assert.Equal(new DateTime(2015, 07, 01, 0, 0, 0), averages[2].Time);
-            Assert.Equal(new DateTime(2016, 01, 01, 0, 0, 0), averages[7].Time);
-            Assert.Equal(new DateTime(2016, 06, 01, 0, 0, 0), averages[12].Time);
+            var i = 0;
+            Assert.Equal(new DateTime(2015, 06, 01, 0, 0, 0), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 06, 30, 23, 59, 59), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 07, 01, 0, 0, 0), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 07, 31, 23, 59, 59), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 08, 01, 0, 0, 0), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 08, 31, 23, 59, 59), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 09, 01, 0, 0, 0), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 09, 30, 23, 59, 59), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 10, 01, 0, 0, 0), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 10, 31, 23, 59, 59), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 11, 01, 0, 0, 0), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 11, 30, 23, 59, 59), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 12, 01, 0, 0, 0), averages[i++].Time);
+            Assert.Equal(new DateTime(2015, 12, 31, 23, 59, 59), averages[i++].Time);
+            Assert.Equal(new DateTime(2016, 01, 01, 0, 0, 0), averages[i++].Time);
+            Assert.Equal(new DateTime(2016, 06, 30, 23, 59, 59), averages.Last().Time);
         }
 
 
@@ -422,7 +457,7 @@ namespace PeriodicTest
         [Fact]
         public void IsNewInterval_WhenMonthAndSameMonthDifferentYears_ReturnsTrue()
         {
-            Assert.True(Periodizer.IsNewInterval(m_Tvqs.Tvq20150601, m_Tvqs.Tvq20160601, Interval.Month));
+            Assert.True(Periodizer.IsNewInterval(m_Tvqs.Tvq20150601.Time, m_Tvqs.Tvq20160601.Time, Interval.Month));
         }
     }
 }

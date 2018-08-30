@@ -24,15 +24,12 @@ namespace Periodic
 
             var result = new Timeseries();
             Tvq previous = null;
-            // Maybe try a while loop instead that moves the time forwards by the smaller of
-            // * the next TVQ
-            // * the next interval
             for (var i = 0; i < ts.Count; i++)
             {
                 var current = ts[i];
                 var isNewInterval = 
                     i == 0 || 
-                    IsNewInterval(previous, current, intervalLength);
+                    previous != null && IsNewInterval(previous.Time, current.Time, intervalLength);
 
                 //
                 // Previous interval end?
@@ -40,25 +37,46 @@ namespace Periodic
                 var doInsertPreviousEnd = isNewInterval && previous != null ; // && not last second
                 if (doInsertPreviousEnd)
                 {
-                    var lastSecondOfPrevious = LastSecondOfInterval(previous, intervalLength);
+                    var lastSecondOfPrevious = LastSecondOfInterval(previous.Time, intervalLength);
                     var tvq = Tvq.CalculateValueAt(lastSecondOfPrevious, previous, current);
                     result.Add(tvq);
+                }
+
+                if (previous != null)
+                {
+                    var hasEmptyIntervalInBetween = 
+                        HasEmptyIntervalInBetween(previous.Time, current.Time, intervalLength);
+                    var t = previous.Time;
+                    while (hasEmptyIntervalInBetween)
+                    {
+                        t = FirstSecondOfNextInterval(t, intervalLength);
+                        var tvq = Tvq.CalculateValueAt(t, previous, current);
+                        result.Add(tvq);
+
+                        var tLastSecond = LastSecondOfInterval(t, intervalLength);
+                        tvq = Tvq.CalculateValueAt(tLastSecond, previous, current);
+                        result.Add(tvq);
+                        
+                        hasEmptyIntervalInBetween = HasEmptyIntervalInBetween(t, current.Time, intervalLength);
+                    }
                 }
 
                 //
                 // Current interval start?
                 //
-                var t = current.Time;
-                var firstSecond = FirstSecond(t, intervalLength);
-                if (isNewInterval && t > firstSecond)
+                var firstSecond = FirstSecond(current.Time, intervalLength);
+                if (isNewInterval && current.Time > firstSecond)
                 {
                     var newTvq = previous == null ?
                         new Tvq(firstSecond, current.V, Quality.Interpolated) : Tvq.CalculateValueAt(firstSecond, previous, current);
                     result.Add(newTvq);
                 }
 
-                result.Add(current); 
-                
+                //
+                // Add point
+                //
+                result.Add(current);
+
                 previous = current;
             }
 
@@ -66,7 +84,7 @@ namespace Periodic
             {
                 if (previous != null)
                 {
-                    var lastSecond = LastSecondOfInterval(previous, intervalLength);
+                    var lastSecond = LastSecondOfInterval(previous.Time, intervalLength);
 
                     var iLast = ts.Count - 1;
                     var lastTvq = ts.Last();
@@ -86,6 +104,51 @@ namespace Periodic
             return result;
         }
 
+        private DateTime FirstSecondOfNextInterval(DateTime t, Interval intervalLength)
+        {
+            switch (intervalLength)
+            {
+                case Interval.Year:
+                    return new DateTime(t.Year + 1, 1, 1, 0, 0, 0, 0);
+                case Interval.Month:
+                    return new DateTime(t.Year, t.Month, 1, 0, 0, 0, 0).AddMonths(1);
+                default:
+                    throw new ArgumentException("Interval not supported", nameof(intervalLength));                    
+            }
+            
+        }
+
+        /// <summary>
+        /// Returns true if the points in time are separated by one or more intervals.
+        /// </summary>
+        /// <param name="t0"></param>
+        /// <param name="t1"></param>
+        /// <param name="intervalLength"></param>
+        /// <returns></returns>
+        /// <example>
+        /// The following return true:
+        /// 2016-01-01, 2016-03-01
+        /// 2017-12-31, 2018-02-01
+        /// </example>
+        public bool HasEmptyIntervalInBetween(DateTime t0, DateTime t1, Interval intervalLength)
+        {
+            if (t0 > t1)
+            {
+                throw new ArgumentException("t0 > t1", nameof(t0));
+            }
+
+            switch (intervalLength)
+            {
+                case Interval.Year:
+                    return t1.Year - t0.Year > 1;
+                case Interval.Month:
+                    var firstInMonth = new DateTime(t0.Year, t0.Month, 1, 0, 0, 0, 0);
+                    return firstInMonth.AddMonths(2) <= t1;
+                default:
+                    throw new ArgumentException("Interval not supported", nameof(intervalLength));                    
+            }
+        }
+
         public static DateTime FirstSecond(DateTime t, Interval intervalLength)
         {
             switch (intervalLength)
@@ -100,33 +163,31 @@ namespace Periodic
             
         }
 
-        public static DateTime LastSecondOfInterval(Tvq tvq, Interval intervalLength)
+        public static DateTime LastSecondOfInterval(DateTime t, Interval intervalLength)
         {
             switch (intervalLength)
             {
                 case Interval.Year:
-                    return new DateTime(tvq.Time.Year, 12, 31, 23, 59, 59);
+                    return new DateTime(t.Year, 12, 31, 23, 59, 59);
                 case Interval.Month:
-                    return new DateTime(tvq.Time.Year, tvq.Time.Month, 
-                        DateTime.DaysInMonth(tvq.Time.Year, tvq.Time.Month), 
+                    return new DateTime(t.Year, t.Month, 
+                        DateTime.DaysInMonth(t.Year, t.Month), 
                         23, 59, 59);
                 default:
                     throw new ArgumentException("Interval not supported", nameof(intervalLength));
             }
         }
 
-        public static bool IsNewInterval(Tvq previous, Tvq current, Interval intervalLength)
+        public static bool IsNewInterval(DateTime previous, DateTime current, Interval intervalLength)
         {
             switch (intervalLength)
             {
                 case Interval.Year:
-                    return previous != null && previous.Time.Year != current.Time.Year;
+                    return previous.Year != current.Year;
                 case Interval.Month:
-                    return previous != null && 
-                           (
-                               previous.Time.Year != current.Time.Year  ||
-                               previous.Time.Month != current.Time.Month
-                            );
+                    return
+                        previous.Year != current.Year ||
+                        previous.Month != current.Month;                        
                 default:
                     throw new ArgumentException("Interval not supported", nameof(intervalLength));
             }
