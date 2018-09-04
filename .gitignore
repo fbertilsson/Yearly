@@ -211,3 +211,5 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 /secrets.txt
+/scripts/myserver.key
+/scripts/myserver.crt
