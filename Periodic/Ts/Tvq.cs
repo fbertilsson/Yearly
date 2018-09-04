@@ -40,7 +40,7 @@ namespace Periodic.Ts
 
         public override string ToString()
         {
-            return $"{Time}\t{V}\t{Q}";
+            return $"{Time} \t{V} \t{Q}";
         }
     }
 }

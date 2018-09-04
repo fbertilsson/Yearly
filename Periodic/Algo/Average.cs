@@ -77,7 +77,7 @@ namespace Periodic.Algo
                 valueAtT1 = current.V; // Extrapolate current value to end of period
             }
 
-            var deltaT = (t1 - previous.Time).TotalSeconds;
+            var deltaT = (t1 - previous.Time).TotalSeconds;  // TODO FB BUG this is wrong because previous has moved on to current
             area += deltaT * (previous.V + valueAtT1) / 2;
 
             var average = area/(t1 - t0).TotalSeconds;
