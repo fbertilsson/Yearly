@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Mvc;
+using MediatR;
 using Microsoft.ApplicationInsights;
 using Periodic;
 using YearlyWeb3.Models;
@@ -12,10 +14,12 @@ namespace YearlyWeb3.Controllers
     [Authorize]
     public class RegisterEntryController : Controller
     {
+        private readonly IMediator _mediator;
         private readonly TelemetryClient _logger;
 
-        public RegisterEntryController()
+        public RegisterEntryController(IMediator mediator)
         {
+            _mediator = mediator;
             _logger = new TelemetryClient();
         }
 
@@ -36,48 +40,25 @@ namespace YearlyWeb3.Controllers
             return View(model);
         }
 
-        [System.Web.Mvc.HttpPost]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SubmitRegisterEntry(RegisterEntryModel model)
         {
             try
             {
-                bool ok;
-                DateTime t;
-                int v;
-                ok = DateTime.TryParse(model.DateString, out t);
-                if (!ok)
-                {
-                    ViewBag.Title = "Fel vid registrering";
-                    ViewBag.SubTitle = "Datum kunde ej tolkas";
-                    return View(model);
-                } // TODO better error handling
+                var command = new AddRegistryEntryCommand(model, User.Identity.Name);
+                var result = _mediator.Send(command).Result;
 
-                ok = int.TryParse(model.RegisterValue, out v);
-                if (!ok)
+                if (result.ValidatedOk)
                 {
-                    ViewBag.Title = "Fel vid registrering";
-                    ViewBag.SubTitle = "Mätarställning kunde ej tolkas";
-                    return View(model);
-                } // TODO better error handling
-
-                var now = DateTime.Now;
-                var isToday =
-                    t.Year == now.Year
-                    && t.Month == now.Month
-                    && t.Day == now.Day;
-
-                var isMidnight = t.Hour == 0 && t.Minute == 0;
-                if (isToday && isMidnight)
-                {
-                    t = now;
+                    ViewBag.Title = "Mätarställning registrerad";
+                    ViewBag.SubTitle = "Mätarställningen blev registrerad";
                 }
-
-                var tvq = new Tvq(t, v, Quality.Ok);
-
-                var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
-                repo.AddRegistryEntry(tvq);
-                ViewBag.Title = "Mätarställning registrerad";
-                ViewBag.SubTitle = "Mätarställningen blev registrerad";
+                else
+                {
+                    ViewBag.Title = "Fel vid registrering";
+                    ViewBag.SubTitle = result.ValidationError;
+                }
                 return View(model);
             }
             catch (Exception e)
@@ -100,7 +81,8 @@ namespace YearlyWeb3.Controllers
             return View(model);
         }
 
-        [System.Web.Mvc.HttpPost]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SubmitRegisterEntries(RegisterEntriesModel model)
         {
             try
@@ -124,7 +106,7 @@ namespace YearlyWeb3.Controllers
             }
         }
 
-        [System.Web.Mvc.HttpGet]
+        [HttpGet]
         public ActionResult ListEntriesView()
         {
             try
@@ -145,7 +127,7 @@ namespace YearlyWeb3.Controllers
             }
         }
 
-        [System.Web.Mvc.HttpPost]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteRegistryEntry([System.Web.Http.FromUri] string dateString)
         {
@@ -168,6 +150,70 @@ namespace YearlyWeb3.Controllers
             }
 
             return RedirectToAction("ListEntriesView");
+        }
+    }
+
+
+    public class AddRegistryEntryResult
+    {
+        public bool ValidatedOk { get; }
+        public string ValidationError { get; }
+
+        public AddRegistryEntryResult(bool validatedOk = true, string validationError = "")
+        {
+            ValidatedOk = validatedOk;
+            ValidationError = validationError;
+        }
+    }   
+    
+    public class AddRegistryEntryCommand : IRequest<AddRegistryEntryResult>
+    {
+        public RegisterEntryModel Model { get; }
+        public string IdentityName { get; }
+
+        public AddRegistryEntryCommand(RegisterEntryModel model, string identityName)
+        {
+            Model = model;
+            IdentityName = identityName;
+        }
+    }
+
+    public class AddRegistryEntryCommandHandler : IRequestHandler<AddRegistryEntryCommand, AddRegistryEntryResult>
+    {
+        public Task<AddRegistryEntryResult> Handle(AddRegistryEntryCommand request, CancellationToken cancellationToken)
+        {
+            DateTime t;
+            var ok = DateTime.TryParse(request.Model.DateString, out t);
+            if (!ok)
+            {
+                return Task.FromResult(new AddRegistryEntryResult(false, "Datum kunde ej tolkas"));
+            } // TODO better error handling
+
+            int v;
+            ok = int.TryParse(request.Model.RegisterValue, out v);
+            if (!ok)
+            {
+                return Task.FromResult(new AddRegistryEntryResult(false, "Mätarställning kunde ej tolkas"));
+            } // TODO better error handling
+
+            var now = DateTime.Now;
+            var isToday =
+                t.Year == now.Year
+                && t.Month == now.Month
+                && t.Day == now.Day;
+
+            var isMidnight = t.Hour == 0 && t.Minute == 0;
+            if (isToday && isMidnight)
+            {
+                t = now;
+            }
+
+            var tvq = new Tvq(t, v, Quality.Ok);
+
+            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo(request.IdentityName);
+            repo.AddRegistryEntry(tvq);
+            var result = new AddRegistryEntryResult();
+            return Task.FromResult(result);
         }
     }
 }
