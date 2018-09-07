@@ -9,10 +9,15 @@ namespace YearlyWeb3.Controllers
     {
         public RegistryEntryRepo GetRegistryEntryRepo()
         {
+            var partitionKey = Thread.CurrentPrincipal.Identity.Name;
+
+            return GetRegistryEntryRepo(partitionKey);
+        }
+
+        public RegistryEntryRepo GetRegistryEntryRepo(string partitionKey)
+        {
             var storageAccount = CloudStorageAccount.Parse(
                 CloudConfigurationManager.GetSetting("StorageConnectionString"));
-
-            var partitionKey = Thread.CurrentPrincipal.Identity.Name;
 
             var repo = new RegistryEntryRepo(storageAccount, partitionKey);
             return repo;
