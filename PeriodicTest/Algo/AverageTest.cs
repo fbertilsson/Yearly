@@ -41,30 +41,49 @@ namespace PeriodicTest.Algo
             Assert.Equal(expected, result.V);
         }
 
-        //[Fact]
-        //public void Apply_When10thIs110And20thIs120_ExtrapolatesValueAt1stTo100()
-        //{
-        //    // Arrange
-        //    var ts = new Timeseries
-        //    {
-        //        new Tvq(
-        //            new DateTime(2015, 01, 10, 0, 0, 0, 0),
-        //            110,
-        //            Quality.Ok),
-        //        new Tvq(
-        //            new DateTime(2015, 01, 20, 0, 0, 0, 0),
-        //            120,
-        //            Quality.Ok)
-        //    };
+        [Fact]
+        public void Apply_When10thIs110And20thIs120_ExtrapolatesValueAt1stTo100()
+        {
+            // Arrange
+            var ts = new Timeseries
+            {
+                new Tvq(
+                    new DateTime(2015, 01, 10, 0, 0, 0, 0),
+                    110,
+                    Quality.Ok),
+                new Tvq(
+                    new DateTime(2015, 01, 20, 0, 0, 0, 0),
+                    120,
+                    Quality.Ok)
+            };
 
-        //    // Act
-        //    var t0 = new DateTime(2015, 01, 01, 0, 0, 0, 0);
-        //    var t1 = new DateTime(2015, 01, 31, 23, 59, 59, 999);
-        //    var result = new Average().Apply(t0, t1, ts);
+            // Act
+            var t0 = new DateTime(2015, 01, 01, 0, 0, 0, 0);
+            var t1 = new DateTime(2015, 01, 31, 23, 59, 59, 999);
+            var result = new Average().Apply(t0, t1, ts);
 
-        //    // Assert
-        //    var expected = (100 + 131) / 2;
-        //    Assert.Equal(expected, result.V);
-        //}
+            // Assert
+            var expected = (100d + 131) / 2;
+            Assert.Equal(expected, result.V, 4);
+        }
+
+        [Fact]
+        public void Apply_When10AtStartOfMonthAnd20AtEnd_ResultIs15()
+        {
+            // Arrange
+            var t0 = new DateTime(2015, 01, 01, 0, 0, 0, 0);
+            var t1 = new DateTime(2015, 01, 31, 23, 59, 59, 999);
+            var ts = new Timeseries
+            {
+                new Tvq(t0, 10, Quality.Ok),
+                new Tvq(t1, 20, Quality.Ok)
+            };
+
+            // Act
+            var result = new Average().Apply(t0, t1, ts);
+
+            // Assert
+            Assert.Equal(15d, result.V, 12);
+        }
     }
 }

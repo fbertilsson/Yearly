@@ -16,12 +16,11 @@ namespace Periodic.Algo
             {
                 currentIndex = i;
                 current = ts[currentIndex];
-                if (current.Time > t0)
+                v0 = current.V;
+                if (current.Time >= t0)
                 {
-                    v0 = current.V; // Value at start of period if first tvq.Time > t0
                     break;
                 }
-                v0 = current.V;
             }
 
             Debug.Assert(ts[currentIndex].Time >= t0);
@@ -33,7 +32,7 @@ namespace Periodic.Algo
 
             double area = 0;
 
-            bool tsHasValueWithinPeriod = current.Time <= t1;
+            var tsHasValueWithinPeriod = current.Time <= t1;
             if (!tsHasValueWithinPeriod)
             {
                 double v1 = 0;

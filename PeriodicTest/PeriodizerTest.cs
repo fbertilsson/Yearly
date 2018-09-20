@@ -280,7 +280,7 @@ namespace PeriodicTest
         }
 
         [Fact]
-        public void MonthlyAverage_WhenOneValueFirstSecondInJan_ReturnsItAsAverage()
+        public void MonthlyAverage_WhenOneValueFirstSecondInJan_Returns0()
         {
             // Arrange
             // Act
@@ -289,11 +289,11 @@ namespace PeriodicTest
             //Assert
             var x = averages[0];
             Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
-            Assert.Equal(m_Tvqs.Tvq20150101.V, x.V);
+            Assert.Equal(0, x.V);
         }
 
         [Fact]
-        public void MonthlyAverage_WhenOneValueInJan_ReturnsAsAverageAtFirstSecond()
+        public void MonthlyAverage_WhenOneValueInJan_Returns0()
         {
             // Arrange
             // Act
@@ -302,8 +302,7 @@ namespace PeriodicTest
             //Assert
             var x = averages[0];
             Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
-            var expectedValue = m_Tvqs.Tvq20150105.V;
-            Assert.Equal(expectedValue, x.V, 5);
+            Assert.Equal(0, x.V, 9);
         }
 
         [Fact]
@@ -378,23 +377,24 @@ namespace PeriodicTest
         public void MonthlyAverage_WhenConstantConsumptionInJanAndJune_FebThroughMayAreCorrect()
         {
             // Arrange
-            // Act
             const double s1 = 1000;
             const double k = 10d;
-            var nDays = m_Tvqs.Tvq20150601.Time.DayOfYear;
+            var nDays = m_Tvqs.Tvq20150601.Time.DayOfYear - 1;
             var endValue = s1 + nDays * k;
             var ts = new Timeseries
             {
                 new Tvq(m_Tvqs.Tvq20150101.Time, s1, Quality.Ok),
                 new Tvq(m_Tvqs.Tvq20150601.Time, endValue, Quality.Ok)
             };
+
+            // Act
             var averages = m_Periodizer.MonthlyAverage(ts);
 
             //Assert
-            Assert.Equal(s1 + 31 * k, averages[1].V, 4);
-            Assert.Equal(s1 + (31 + 27) * k, averages[2].V, 4);
-            Assert.Equal(s1 + (31 + 27 + 31) * k, averages[3].V, 4);
-            Assert.Equal(s1 + (31 + 27 + 31 + 30) * k, averages[4].V, 4);
+            Assert.Equal(31 * k, averages[0].V, 3);
+            Assert.Equal(28 * k, averages[1].V, 3);
+            Assert.Equal(31 * k, averages[2].V, 3);
+            Assert.Equal(30 * k, averages[3].V, 3);
         }
 
         [Fact]
@@ -419,39 +419,28 @@ namespace PeriodicTest
         }
 
         [Fact]
-        public void MonthlyAverage_WhenFrom2015To2017_LastMonthIsCorrect()
-        {
-            // Arrange
-            // Act
-            const double v = 1000;
-            var ts = new Timeseries
-            {
-                new Tvq(m_Tvqs.Tvq20150601.Time, v, Quality.Ok),
-                new Tvq(m_Tvqs.Tvq20170601.Time, v, Quality.Ok)
-            };
-            var averages = m_Periodizer.MonthlyAverage(ts);
-
-            //Assert
-            var last = averages.Last();
-            Assert.Equal(new DateTime(2017, 06, 01, 0, 0, 0), last.Time);
-            Assert.Equal(v, last.V);
-        }
-
-        [Fact]
         public void MonthlyAverage_WhenFrom2015To2017_June2016IsAverage()
         {
             // Arrange
-            // Act
+            const int v0 = 300;
+            const int v1 = 500;
+            var t0 = m_Tvqs.Tvq20150601.Time;
+            var t1 = new DateTime(2017, 07, 01, 0, 0, 0);
             var ts = new Timeseries
             {
-                new Tvq(m_Tvqs.Tvq20150601.Time, 200, Quality.Ok),
-                new Tvq(new DateTime(2017, 07, 01, 0, 0, 0), 400, Quality.Ok)
+                new Tvq(t0, v0, Quality.Ok),
+                new Tvq(t1, v1, Quality.Ok)
             };
+
+            // Act
             var averages = m_Periodizer.MonthlyAverage(ts);
 
             //Assert
-            var average = averages.First(a => a.Time == m_Tvqs.Tvq20160601.Time);
-            Assert.Equal(300d, average.V, 0);
+            var tx = m_Tvqs.Tvq20160601.Time;
+            var actual = averages.First(a => a.Time == tx);
+            var consumptionPerDay = (v1 - v0) / (t1 - t0).TotalDays;
+            var expected = consumptionPerDay * DateTime.DaysInMonth(tx.Year, tx.Month);
+            Assert.Equal(expected, actual.V, 0);
         }
 
         [Fact]

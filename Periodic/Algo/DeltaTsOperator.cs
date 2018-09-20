@@ -26,15 +26,18 @@ namespace Periodic.Algo
 
             var result = new Timeseries();
 
-            var enumerator = ts.GetEnumerator();
-            enumerator.MoveNext();
-            var previous = enumerator.Current;
-            while (enumerator.MoveNext())
+            using (var enumerator = ts.GetEnumerator())
             {
-                var current = enumerator.Current;
-                var delta = CalculateDelta(current, previous);
-                result.Add(delta);
-                previous = current;
+                enumerator.MoveNext();
+                var previous = enumerator.Current;
+                //result.Add(new Tvq(previous.Time, 0, Quality.Interpolated)); // TODO FB trying to indicate that the consumption starts at 0, but that may not work well if algorithms extrapolate backwards
+                while (enumerator.MoveNext())
+                {
+                    var current = enumerator.Current;
+                    var delta = CalculateDelta(current, previous);
+                    result.Add(delta);
+                    previous = current;
+                }
             }
 
             return result;
