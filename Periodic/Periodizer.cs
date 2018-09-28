@@ -198,8 +198,10 @@ namespace Periodic
         /// Return a time series with one entry per month
         /// where the time is the first second of the month
         /// and the value is the average.
+        /// 
+        /// Handles roll over and meter change.
         /// </summary>
-        /// <param name="ts"></param>
+        /// <param name="ts">A time series with meter values, possibly with roll over and meter change.</param>
         /// <returns></returns>
         public Timeseries MonthlyAverage(Timeseries ts)
         {
@@ -212,6 +214,13 @@ namespace Periodic
             return result;
         }
 
+        /// <summary>
+        /// Periodizes a time series with relative consumption
+        /// </summary>
+        /// <param name="op"></param>
+        /// <param name="ts">A time series with relative consumption, without roll over or meter change</param>
+        /// <param name="interval"></param>
+        /// <returns></returns>
         private Timeseries Periodize(IUnaryAggregateOperator op, Timeseries ts, Interval interval)
         {
             var result = new Timeseries();
@@ -219,7 +228,7 @@ namespace Periodic
             using (var enumerator = ts.GetEnumerator())
             {
                 DateTime? intervalStart = null;
-                Tvq nextTvq = null;
+                Tvq nextTvq;
                 while (enumerator.MoveNext())
                 {
                     var currentTvq = enumerator.Current;
@@ -256,10 +265,10 @@ namespace Periodic
                             Math.Max(0d, tentativeValueAtIntervalStart.V),
                             tentativeValueAtIntervalStart.Q);
                         tsForPeriod.Add(valueAtIntervalStart);
-
-                        tsForPeriod.Add(currentTvq);
                     }
 
+                    tsForPeriod.Add(currentTvq);
+                    Tvq previousTvq = null;
                     var isDone = false;
                     do
                     {
@@ -274,6 +283,7 @@ namespace Periodic
                                 tsForPeriod.Add(Tvq.CalculateValueAt(nextIntervalStart, currentTvq, nextTvq));
                             }
 
+                            previousTvq = currentTvq;
                             currentTvq = nextTvq;
                             enumerator.MoveNext();
                             nextTvq = enumerator.Current;
@@ -289,9 +299,28 @@ namespace Periodic
                         }
                     } while (! isDone);
 
+                    if (tsForPeriod.Last().Time < nextIntervalStart)
+                    {
+                        Tvq valueAtNext;
+                        if (previousTvq == null)
+                        {
+                            valueAtNext = new Tvq(nextIntervalStart, 0, Quality.Interpolated);
+                        }
+                        else
+                        {
+                            valueAtNext = Tvq.CalculateValueAt(nextIntervalStart, previousTvq, currentTvq);
+                        }
+
+                        tsForPeriod.Add(valueAtNext);
+                    }
+
                     if (tsForPeriod.Any())
                     {
-                        result.Add(op.Apply(intervalStart.Value, nextIntervalStart, tsForPeriod));
+                        var v0 = tsForPeriod.First().V;
+                        var v1 = tsForPeriod.Last().V;
+                        var consumptionInPeriod = v1 - v0;
+                        result.Add(new Tvq(intervalStart.Value, consumptionInPeriod, Quality.Ok));
+                        // result.Add(op.Apply(intervalStart.Value, nextIntervalStart, tsForPeriod));
                     }
                     else
                     {

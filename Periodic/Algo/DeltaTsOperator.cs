@@ -6,7 +6,7 @@ namespace Periodic.Algo
     /// <summary>
     /// Calculates a delta series given a series, where each result TVQ is the
     /// difference from the previous TVQ value. For example, calculates
-    /// consumption from register entries.
+    /// deltas from register entries. Handles rollover.
     /// </summary>
     public class DeltaTsOperator : IUnaryTsOperator
     {
