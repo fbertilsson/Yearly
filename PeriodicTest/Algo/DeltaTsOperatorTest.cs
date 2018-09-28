@@ -41,26 +41,38 @@ namespace PeriodicTest.Algo
         }
 
         [Fact]
+        public void Apply_When5And7_FirstValueId0AtFirstTime()
+        {
+            var ts = new Timeseries { m_Tvq5, m_Tvq7, };
+            var result = m_Delta.Apply(ts);
+            Assert.Equal(0d, result[0].V);
+            Assert.Equal(m_Tvq5.Time, result[0].Time);
+        }
+
+        [Fact]
         public void Apply_When5And7_DeltaIs2()
         {
             var ts = new Timeseries { m_Tvq5, m_Tvq7, };
             var result = m_Delta.Apply(ts);
-            Assert.Equal(2, result[0].V);
+            Assert.Equal(2, result[1].V);
         }
 
 
         [Fact]
-        public void Apply_WhenThreeValues_ResultHasTwoCurrectValues()
+        public void Apply_WhenThreeValues_ResultHasThreeCurrectValues()
         {
             var ts = new Timeseries { m_Tvq5, m_Tvq7, m_Tvq11, };
             var result = m_Delta.Apply(ts);
-            Assert.Equal(2, result.Count);
-            Assert.Equal(m_t1, result[0].Time);
-            Assert.Equal(m_t2, result[1].Time);
-            Assert.Equal(2, result[0].V);
-            Assert.Equal(4, result[1].V);
+            Assert.Equal(3, result.Count);
+            Assert.Equal(m_t0, result[0].Time);
+            Assert.Equal(m_t1, result[1].Time);
+            Assert.Equal(m_t2, result[2].Time);
+            Assert.Equal(0, result[0].V);
+            Assert.Equal(2, result[1].V);
+            Assert.Equal(4, result[2].V);
             Assert.Equal(Quality.Ok, result[0].Q);
             Assert.Equal(Quality.Ok, result[1].Q);
+            Assert.Equal(Quality.Ok, result[2].Q);
         }
     }
 }

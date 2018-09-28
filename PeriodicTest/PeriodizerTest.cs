@@ -310,48 +310,115 @@ namespace PeriodicTest
         {
             // Arrange
             // Act
-            const double v = 500;
+            const double v0 = 0;
+            const double v1 = 500;
             var ts = new Timeseries
             {
-                new Tvq(m_Tvqs.Tvq20150105.Time, 0, Quality.Ok),
-                new Tvq(m_Tvqs.Tvq20150110.Time, v, Quality.Ok)
+                new Tvq(m_Tvqs.Tvq20150105.Time, v0, Quality.Ok),
+                new Tvq(m_Tvqs.Tvq20150110.Time, v1, Quality.Ok)
             };
             var averages = m_Periodizer.MonthlyAverage(ts);
 
             //Assert
             var x = averages[0];
             Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
-            var area1 = 4 * v;
-            var area2 = 5 * v / 2;
+            var area1 = 4 * v1;
+            var area2 = 5 * v1 / 2;
             area1 = 0;
             var nDaysRising = 31 - 5 + 0;
             var k = 500d / 5;
             var endValue = k * nDaysRising;
             area2 = nDaysRising * endValue / 2;
             var expectedValue = (area1 + area2) / 31;
+
+            var totalDays = (ts[1].Time - ts[0].Time).Days;
+            var consumptionPerDay = (v1 - v0) / totalDays;
+            var nDaysConsumptionJan = 1 + 31 - ts[0].Time.Day;
+            expectedValue = (nDaysConsumptionJan / 31d) * (consumptionPerDay * nDaysConsumptionJan) / 2;
+
+            area1 = (v1 - v0) / 2 * totalDays;
+            area2 = consumptionPerDay * (1 + 31 - ts[1].Time.Day);
+            expectedValue = (area1 + area2) / 31d; // 111
+
+
+
             Assert.Equal(expectedValue, x.V, 4);
+        }
+
+
+        [Fact]
+        public void MonthlyAverage_When1ValueAtStartOfJanAnd1InFeb_InterpolatesEndValue()
+        {
+            // Arrange
+            const double v0 = 0;
+            const double v1 = v0 + 600d;
+            var ts = new Timeseries
+            {
+                new Tvq(m_Tvqs.Tvq20150101.Time, v0, Quality.Ok),
+                new Tvq(new DateTime(2015, 2, 23, 0, 0, 0), v1, Quality.Ok)
+            };
+
+            // Act
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            var x = averages[0];
+            Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
+            const int nDaysJan = 31;
+            const double totalDays = nDaysJan + 22;
+            const double consumptionPerDay = (v1 - v0) / totalDays;
+            const double expectedValue = consumptionPerDay * nDaysJan;
+            Assert.Equal(expectedValue, x.V, 7);
+        }
+
+        [Fact]
+        public void MonthlyAverage_When1ValueAtStartOfJanAnd1InFebAndFirstIs1000_InterpolatesEndValue()
+        {
+            // Arrange
+            const double v0 = 1000;
+            const double v1 = v0 + 600d;
+            var ts = new Timeseries
+            {
+                new Tvq(m_Tvqs.Tvq20150101.Time, v0, Quality.Ok),
+                new Tvq(new DateTime(2015, 2, 23, 0, 0, 0), v1, Quality.Ok)
+            };
+
+            // Act
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            var x = averages[0];
+            Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
+            const int nDaysJan = 31;
+            const double totalDays = nDaysJan + 22;
+            const double consumptionPerDay = (v1 - v0) / totalDays;
+            const double expectedValue = consumptionPerDay * nDaysJan;
+            Assert.Equal(expectedValue, x.V, 7);
         }
 
         [Fact]
         public void MonthlyAverage_When1ValueInMiddleOfJanAnd1InFeb_InterpolatesEndValue()
         {
             // Arrange
-            // Act
-            const double v = 0;
+            const double v0 = 0;
+            const double v1 = v0 + 700d;
             var ts = new Timeseries
             {
-                new Tvq(m_Tvqs.Tvq20150110.Time, v, Quality.Ok),
-                new Tvq(new DateTime(2015, 2, 23, 0, 0, 0), 600, Quality.Ok)
+                new Tvq(m_Tvqs.Tvq20150110.Time, v0, Quality.Ok),
+                new Tvq(new DateTime(2015, 2, 23, 0, 0, 0), v1, Quality.Ok)
             };
+
+            // Act
             var averages = m_Periodizer.MonthlyAverage(ts);
 
             //Assert
             var x = averages[0];
             Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
-            var area1 = 9 * v;
-            const int nDays = 31 - 10 + 1;
-            var area2 = (v + 300d) / 2d * nDays;
-            var expectedValue = (area1 + area2) / 31d;
+            var totalDays = (ts[1].Time - ts[0].Time).Days;
+            var consumptionPerDay = (v1 - v0) / totalDays;
+            var nDaysConsumptionJan = 1 + 31 - ts[0].Time.Day;
+            var expectedValue = (nDaysConsumptionJan / 31d) * (consumptionPerDay * nDaysConsumptionJan) / 2;
+
             Assert.Equal(expectedValue, x.V, 3);
         }
 

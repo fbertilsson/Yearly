@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using Periodic.Algo;
 using Periodic.Ts;
@@ -202,11 +203,102 @@ namespace Periodic
         /// <returns></returns>
         public Timeseries MonthlyAverage(Timeseries ts)
         {
-            var interpolatedTs = InsertPoints(ts, Interval.Month);
-            var deltaOperator = new DeltaTsOperator();
-            var consumptionTs = deltaOperator.Apply(interpolatedTs);
+            if (ts == null || !ts.Any()) return new Timeseries();
 
-            var result = new Aggregate().Apply(new Average(), consumptionTs);
+            var deltaOperator = new DeltaTsOperator();
+            var consumptionTs = deltaOperator.Apply(ts);
+
+            var result = Periodize(new Average(), consumptionTs, Interval.Month);
+            return result;
+        }
+
+        private Timeseries Periodize(IUnaryAggregateOperator op, Timeseries ts, Interval interval)
+        {
+            var result = new Timeseries();
+
+            using (var enumerator = ts.GetEnumerator())
+            {
+                DateTime? intervalStart = null;
+                Tvq nextTvq = null;
+                while (enumerator.MoveNext())
+                {
+                    var currentTvq = enumerator.Current;
+                    Debug.Assert(currentTvq != null);
+
+                    if (intervalStart == null)
+                    {
+                        intervalStart = FirstSecond(currentTvq.Time, interval);
+                    }
+
+                    var nextIntervalStart = FirstSecondOfNextInterval(currentTvq.Time, interval);
+
+                    Debug.Assert(currentTvq.Time >= intervalStart);
+                    Debug.Assert(currentTvq.Time <= nextIntervalStart);
+
+                    enumerator.MoveNext();
+                    nextTvq = enumerator.Current;
+
+                    //
+                    // Create a new timeseries to pass to the operator
+                    //
+
+                    var tsForPeriod = new Timeseries();
+                    if (currentTvq.Time > intervalStart)
+                    {
+                        var tentativeValueAtIntervalStart = Tvq.CalculateValueAt(intervalStart.Value, currentTvq, nextTvq);
+
+                        //
+                        // A negative consumption is probably a start of the time series. Set it to 0.
+                        // E.g. 0 at the 10:th and 90 at month end.
+                        //
+                        var valueAtIntervalStart = new Tvq(
+                            tentativeValueAtIntervalStart.Time, 
+                            Math.Max(0d, tentativeValueAtIntervalStart.V),
+                            tentativeValueAtIntervalStart.Q);
+                        tsForPeriod.Add(valueAtIntervalStart);
+
+                        tsForPeriod.Add(currentTvq);
+                    }
+
+                    var isDone = false;
+                    do
+                    {
+                        if (nextTvq == null)
+                        {
+                            isDone = true;
+                        }
+                        else
+                        {
+                            if (nextTvq.Time > nextIntervalStart)
+                            {
+                                tsForPeriod.Add(Tvq.CalculateValueAt(nextIntervalStart, currentTvq, nextTvq));
+                            }
+
+                            currentTvq = nextTvq;
+                            enumerator.MoveNext();
+                            nextTvq = enumerator.Current;
+
+                            if (IsNewInterval(intervalStart.Value, currentTvq.Time, interval))
+                            {
+                                isDone = true;
+                            }
+                            else
+                            {
+                                tsForPeriod.Add(currentTvq);
+                            }
+                        }
+                    } while (! isDone);
+
+                    if (tsForPeriod.Any())
+                    {
+                        result.Add(op.Apply(intervalStart.Value, nextIntervalStart, tsForPeriod));
+                    }
+                    else
+                    {
+                        result.Add(new Tvq(intervalStart.Value, 0, Quality.Suspect));
+                    }
+                }
+            }
             return result;
         }
     }
