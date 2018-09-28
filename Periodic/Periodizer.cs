@@ -228,38 +228,42 @@ namespace Periodic
             using (var enumerator = ts.GetEnumerator())
             {
                 DateTime? intervalStart = null;
-                Tvq nextTvq;
-                while (enumerator.MoveNext())
+                DateTime nextIntervalStart = DateTime.MinValue;
+                var areMoreValues = enumerator.MoveNext();
+                Tvq currentTvq = null;
+                Tvq previousTvq = null;
+                Tvq nextTvq = enumerator.Current;
+                var doNeedToMove = true;
+                var tsForPeriod = new Timeseries();
+                while (areMoreValues)
                 {
-                    var currentTvq = enumerator.Current;
-                    Debug.Assert(currentTvq != null);
-
-                    if (intervalStart == null)
+                    // Setup previous, current and next if we need to
+                    if (doNeedToMove)
                     {
-                        intervalStart = FirstSecond(currentTvq.Time, interval);
+                        enumerator.MoveNext();
+                        previousTvq = currentTvq;
+                        currentTvq = nextTvq;
+                        nextTvq = enumerator.Current;
+                        Debug.Assert(currentTvq != null);
                     }
 
-                    var nextIntervalStart = FirstSecondOfNextInterval(currentTvq.Time, interval);
+                    // Initialize interval
+                    if (!intervalStart.HasValue)
+                    {
+                        intervalStart = FirstSecond(currentTvq.Time, interval);
+                        nextIntervalStart = FirstSecondOfNextInterval(intervalStart.Value, interval);
+                    }
 
                     Debug.Assert(currentTvq.Time >= intervalStart);
                     Debug.Assert(currentTvq.Time <= nextIntervalStart);
 
-                    enumerator.MoveNext();
-                    nextTvq = enumerator.Current;
-
-                    //
-                    // Create a new timeseries to pass to the operator
-                    //
-
-                    var tsForPeriod = new Timeseries();
-                    if (currentTvq.Time > intervalStart)
+                    var isFirstValueNotAtStart = !tsForPeriod.Any() && (currentTvq.Time > intervalStart);
+                    if (isFirstValueNotAtStart)
                     {
                         var tentativeValueAtIntervalStart = Tvq.CalculateValueAt(intervalStart.Value, currentTvq, nextTvq);
 
-                        //
                         // A negative consumption is probably a start of the time series. Set it to 0.
                         // E.g. 0 at the 10:th and 90 at month end.
-                        //
                         var valueAtIntervalStart = new Tvq(
                             tentativeValueAtIntervalStart.Time, 
                             Math.Max(0d, tentativeValueAtIntervalStart.V),
@@ -268,64 +272,73 @@ namespace Periodic
                     }
 
                     tsForPeriod.Add(currentTvq);
-                    Tvq previousTvq = null;
-                    var isDone = false;
-                    do
+
+                    do  // next value may be many periods ahead
                     {
                         if (nextTvq == null)
                         {
-                            isDone = true;
-                        }
-                        else
-                        {
-                            if (nextTvq.Time > nextIntervalStart)
+                            if (previousTvq != null) // Handle input with only one value
                             {
-                                tsForPeriod.Add(Tvq.CalculateValueAt(nextIntervalStart, currentTvq, nextTvq));
+                                tsForPeriod.Add(Tvq.CalculateValueAt(nextIntervalStart, previousTvq, currentTvq));
                             }
 
-                            previousTvq = currentTvq;
-                            currentTvq = nextTvq;
-                            enumerator.MoveNext();
-                            nextTvq = enumerator.Current;
-
-                            if (IsNewInterval(intervalStart.Value, currentTvq.Time, interval))
-                            {
-                                isDone = true;
-                            }
-                            else
-                            {
-                                tsForPeriod.Add(currentTvq);
-                            }
+                            var v0 = tsForPeriod.First().V;
+                            var v1 = tsForPeriod.Last().V;
+                            var consumptionInPeriod = v1 - v0;
+                            result.Add(new Tvq(intervalStart.Value, consumptionInPeriod, Quality.Interpolated));
                         }
-                    } while (! isDone);
-
-                    if (tsForPeriod.Last().Time < nextIntervalStart)
-                    {
-                        Tvq valueAtNext;
-                        if (previousTvq == null)
+                        else if (nextIntervalStart <= nextTvq.Time)
                         {
-                            valueAtNext = new Tvq(nextIntervalStart, 0, Quality.Interpolated);
+                            var endValue = Tvq.CalculateValueAt(nextIntervalStart, currentTvq, nextTvq);
+                            tsForPeriod.Add(endValue);
+                            doNeedToMove = false;
+
+                            var v0 = tsForPeriod.First().V;
+                            var v1 = tsForPeriod.Last().V;
+                            var consumptionInPeriod = v1 - v0;
+                            result.Add(new Tvq(intervalStart.Value, consumptionInPeriod, Quality.Interpolated));
+
+                            tsForPeriod.Clear();
+                            tsForPeriod.Add(endValue); // TODO FB Just keep track of start and end value instead.
+                            intervalStart = nextIntervalStart;
+                            nextIntervalStart = FirstSecondOfNextInterval(intervalStart.Value, interval);
                         }
-                        else
+                        else 
                         {
-                            valueAtNext = Tvq.CalculateValueAt(nextIntervalStart, previousTvq, currentTvq);
+                            doNeedToMove = true;
                         }
 
-                        tsForPeriod.Add(valueAtNext);
-                    }
+                    } while (! doNeedToMove);
 
-                    if (tsForPeriod.Any())
-                    {
-                        var v0 = tsForPeriod.First().V;
-                        var v1 = tsForPeriod.Last().V;
-                        var consumptionInPeriod = v1 - v0;
-                        result.Add(new Tvq(intervalStart.Value, consumptionInPeriod, Quality.Ok));
-                        // result.Add(op.Apply(intervalStart.Value, nextIntervalStart, tsForPeriod));
-                    }
-                    else
-                    {
-                        result.Add(new Tvq(intervalStart.Value, 0, Quality.Suspect));
-                    }
+                    //if (tsForPeriod.Last().Time < nextIntervalStart)
+                    //{
+                    //    Tvq valueAtNext;
+                    //    if (previousTvq == null)
+                    //    {
+                    //        valueAtNext = new Tvq(nextIntervalStart, 0, Quality.Interpolated);
+                    //    }
+                    //    else
+                    //    {
+                    //        valueAtNext = Tvq.CalculateValueAt(nextIntervalStart, previousTvq, currentTvq);
+                    //    }
+
+                    //    tsForPeriod.Add(valueAtNext);
+                    //}
+
+                    //if (tsForPeriod.Any())
+                    //{
+                    //    var v0 = tsForPeriod.First().V;
+                    //    var v1 = tsForPeriod.Last().V;
+                    //    var consumptionInPeriod = v1 - v0;
+                    //    result.Add(new Tvq(intervalStart.Value, consumptionInPeriod, Quality.Ok));
+                    //    // result.Add(op.Apply(intervalStart.Value, nextIntervalStart, tsForPeriod));
+                    //}
+                    //else
+                    //{
+                    //    result.Add(new Tvq(intervalStart.Value, 0, Quality.Suspect));
+                    //}
+
+                    areMoreValues = nextTvq != null;
                 }
             }
             return result;

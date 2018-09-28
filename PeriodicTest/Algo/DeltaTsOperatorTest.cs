@@ -34,10 +34,12 @@ namespace PeriodicTest.Algo
         }
 
         [Fact]
-        public void Apply_WhenTsHasOneValue_ThrowsArgumentException()
+        public void Apply_WhenTsHasOneValue_Returns0()
         {
             var ts = new Timeseries {new Tvq(m_t0, 0, Quality.Ok)};
-            Assert.Throws<ArgumentException>(() => m_Delta.Apply(ts));
+            var result = m_Delta.Apply(ts);
+            Assert.Equal(0, result[0].V);
+            Assert.Equal(m_t0, result[0].Time);
         }
 
         [Fact]
