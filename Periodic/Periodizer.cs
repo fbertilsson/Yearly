@@ -161,7 +161,6 @@ namespace Periodic
                 default:
                     throw new ArgumentException("Interval not supported", nameof(intervalLength));
             }
-            
         }
 
         public static DateTime LastSecondOfInterval(DateTime t, Interval intervalLength)
@@ -235,7 +234,6 @@ namespace Periodic
                 Tvq previousTvq;
                 Tvq nextTvq = enumerator.Current;
                 var doNeedToMove = true;
-                var tsForPeriod = new Timeseries();
                 double sumForPeriod = 0;
                 while (areMoreValues)
                 {
@@ -257,69 +255,37 @@ namespace Periodic
                     Debug.Assert(currentTvq.Time >= intervalStart);
                     Debug.Assert(currentTvq.Time <= nextIntervalStart);
 
-                    var isFirstValueNotAtStart = !tsForPeriod.Any() && (currentTvq.Time > intervalStart);
-                    if (isFirstValueNotAtStart)
-                    {
-                        var tentativeValueAtIntervalStart = Tvq.CalculateValueAt(intervalStart.Value, currentTvq, nextTvq);
-
-                        // A negative consumption is probably a start of the time series. Set it to 0.
-                        // E.g. 0 at the 10:th and 90 at month end.
-                        var valueAtIntervalStart = new Tvq(
-                            tentativeValueAtIntervalStart.Time, 
-                            Math.Max(0d, tentativeValueAtIntervalStart.V),
-                            tentativeValueAtIntervalStart.Q);
-                        tsForPeriod.Add(valueAtIntervalStart);
-                    }
-
-                    tsForPeriod.Add(currentTvq);
-                    //sumForPeriod += currentTvq.V;
-
                     do  // next value may be many periods ahead
                     {
                         if (nextTvq == null)
                         {
                             if (previousTvq != null) // Prevent input with only one value from entering
                             {
-                                var endValue = Tvq.CalculateValueAt(nextIntervalStart, previousTvq, currentTvq);
-                                tsForPeriod.Add(endValue); // TODO FB remove
-                                //sumForPeriod = endValue.V;
                                 sumForPeriod +=
                                     currentTvq.V
                                     / (currentTvq.Time - previousTvq.Time).TotalDays
                                     * (nextIntervalStart - previousTvq.Time).TotalDays; // Extrapolate consumption to end of interval
-                                //(endValue.V / (currentTvq.Time - previousTvq.Time).TotalDays)
-                                //* (nextIntervalStart - currentTvq.Time).TotalDays;
                             }
 
-                            var v0 = tsForPeriod.First().V;
-                            var v1 = tsForPeriod.Last().V;
-                            var consumptionInPeriod = v1 - v0; // TODO FB remove
-                            consumptionInPeriod = sumForPeriod;
-                            result.Add(new Tvq(intervalStart.Value, consumptionInPeriod, Quality.Interpolated));
+                            result.Add(new Tvq(intervalStart.Value, sumForPeriod, Quality.Interpolated));
                             sumForPeriod = 0;
                         }
                         else if (nextIntervalStart <= nextTvq.Time)
                         {
-                            var endValue = Tvq.CalculateValueAt(nextIntervalStart, currentTvq, nextTvq);
-                            tsForPeriod.Add(endValue);
                             doNeedToMove = false;
 
-                            var v0 = tsForPeriod.First().V;
-                            var v1 = tsForPeriod.Last().V;
-                            var consumptionInPeriod = v1 - v0; // TODO FB remove
                             sumForPeriod += currentTvq.V;
-                            //sumForPeriod += endValue.V;
+                            
                             var remainingConsumptionBelongingToThisPeriod = nextTvq.V
                                     * (nextIntervalStart - currentTvq.Time).TotalDays
                                     / (nextTvq.Time - currentTvq.Time).TotalDays;
-                            consumptionInPeriod =
+
+                            var consumptionInPeriod =
                                 sumForPeriod
                                 + remainingConsumptionBelongingToThisPeriod;
                             result.Add(new Tvq(intervalStart.Value, consumptionInPeriod, Quality.Interpolated));
                             sumForPeriod = -remainingConsumptionBelongingToThisPeriod - currentTvq.V; // This is how much of nextTvq.V that we already have added.
 
-                            tsForPeriod.Clear();
-                            tsForPeriod.Add(endValue); // Could instead keep track of start and end values
                             intervalStart = nextIntervalStart;
                             nextIntervalStart = FirstSecondOfNextInterval(intervalStart.Value, interval);
                         }
