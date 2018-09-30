@@ -617,6 +617,30 @@ namespace PeriodicTest
             var expected = consumptionPerDay * DateTime.DaysInMonth(tx.Year, tx.Month);
             Assert.Equal(expected, actual.V, 0);
         }
+        
+        [Fact]
+        public void MonthlyAverage_WhenSeveralEntriesInMonth_ConsumptionIsPositive()
+        {
+            // Arrange
+            var ts = new Timeseries
+            {
+                new Tvq(new DateTime(2015, 01, 24, 0, 0, 0), 545689, Quality.Ok),
+                new Tvq(new DateTime(2015, 02, 24, 0, 0, 0), 549154, Quality.Ok),
+                new Tvq(new DateTime(2015, 02, 25, 0, 0, 0), 549325, Quality.Ok),
+                new Tvq(new DateTime(2015, 02, 26, 0, 0, 0), 549424, Quality.Ok),
+                new Tvq(new DateTime(2015, 02, 28, 0, 0, 0), 549627, Quality.Ok),
+                new Tvq(new DateTime(2015, 03, 04, 0, 0, 0), 549991, Quality.Ok)
+            };
+
+            // Act
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            Assert.Equal(3, averages.Count);
+            Assert.True(averages[0].V > 0);
+            Assert.True(averages[1].V > 0);
+            Assert.True(averages[2].V > 0);
+        }
 
         [Fact]
         public void IsNewInterval_WhenMonthAndSameMonthDifferentYears_ReturnsTrue()

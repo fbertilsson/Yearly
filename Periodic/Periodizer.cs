@@ -316,7 +316,7 @@ namespace Periodic
                                 sumForPeriod
                                 + remainingConsumptionBelongingToThisPeriod;
                             result.Add(new Tvq(intervalStart.Value, consumptionInPeriod, Quality.Interpolated));
-                            sumForPeriod = -remainingConsumptionBelongingToThisPeriod; // This is how much of nextTvq.V that we already have added.
+                            sumForPeriod = -remainingConsumptionBelongingToThisPeriod - currentTvq.V; // This is how much of nextTvq.V that we already have added.
 
                             tsForPeriod.Clear();
                             tsForPeriod.Add(endValue); // Could instead keep track of start and end values
@@ -325,7 +325,7 @@ namespace Periodic
                         }
                         else 
                         {
-                            //sumForPeriod += currentTvq.V;
+                            sumForPeriod += currentTvq.V;
                             doNeedToMove = true;
                         }
 
