@@ -26,7 +26,6 @@ namespace Periodic.Algo
 
             var result = new Timeseries();
 
-            int i = 1;
             using (var enumerator = ts.GetEnumerator())
             {
                 if (!enumerator.MoveNext())
@@ -35,22 +34,15 @@ namespace Periodic.Algo
                 }
 
                 var previous = enumerator.Current;
-                result.Add(new Tvq(previous.Time, 0, Quality.Ok)); // TODO FB trying to indicate that the consumption starts at 0, but that may not work well if algorithms extrapolate backwards
+                result.Add(new Tvq(previous.Time, 0, Quality.Ok)); // trying to indicate that the consumption starts at 0, but that may not work well if algorithms extrapolate backwards
                 while (enumerator.MoveNext())
                 {
-                    i++;
-
                     var current = enumerator.Current;
                     var delta = CalculateDelta(current, previous);
                     result.Add(delta);
                     previous = current;
                 }
             }
-            // TODO FB this behavior makes the periodizer behave very strictly
-            //if (i < 2)
-            //{
-            //    throw new ArgumentException("ts must contain at least two elements", paramNameTs);
-            //}
             return result;
         }
 

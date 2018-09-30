@@ -362,7 +362,7 @@ namespace PeriodicTest
         }
 
         [Fact]
-        public void MonthlyAverage_When1ValueAtStartOfJanAnd1InFebAndFirstIs1000_InterpolatesEndValue()
+        public void MonthlyAverage_When1ValueAtStartOfJanAnd1InFebAndFirstIs1000_InterpolatesJanEndValue()
         {
             // Arrange
             const double v0 = 1000;
@@ -387,7 +387,7 @@ namespace PeriodicTest
         }
 
         [Fact]
-        public void MonthlyAverage_When1ValueInMiddleOfJanAnd1InFeb_InterpolatesEndValue()
+        public void MonthlyAverage_When1ValueInMiddleOfJanAnd1InFeb_InterpolatesJanEndValue()
         {
             // Arrange
             const double v0 = 0;
@@ -404,6 +404,34 @@ namespace PeriodicTest
             //Assert
             var x = averages[0];
             Assert.Equal(m_Tvqs.Tvq20150101.Time, x.Time);
+            var totalDays = (ts[1].Time - ts[0].Time).Days;
+            var consumptionPerDay = (v1 - v0) / totalDays;
+            var nDaysConsumptionJan = 1 + 31 - ts[0].Time.Day;
+            var expectedValue = v0 + nDaysConsumptionJan * consumptionPerDay;
+
+            Assert.Equal(expectedValue, x.V, 3);
+        }
+
+        
+        [Fact]
+        public void MonthlyAverage_When1ValueInMiddleOfJanAnd1InFeb_ExtrapolatesFebEndValue()
+        {
+            // Arrange
+            const double v0 = 0;
+            const double v1 = v0 + 700d;
+            const double v2 = v1 + 200d;
+            var ts = new Timeseries
+            {
+                new Tvq(m_Tvqs.Tvq20150110.Time, v0, Quality.Ok),
+                new Tvq(new DateTime(2015, 2, 13, 0, 0, 0), v1, Quality.Ok),
+                new Tvq(new DateTime(2015, 2, 24, 0, 0, 0), v2, Quality.Ok)
+            };
+
+            // Act
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            var x = averages[0];
             var totalDays = (ts[1].Time - ts[0].Time).Days;
             var consumptionPerDay = (v1 - v0) / totalDays;
             var nDaysConsumptionJan = 1 + 31 - ts[0].Time.Day;
@@ -453,6 +481,71 @@ namespace PeriodicTest
             const int nDaysJan = 31;
             const double expectedValue = consumptionPerDay * nDaysJan;
             Assert.Equal(expectedValue, x.V, 7);
+        }
+
+        [Fact]
+        public void MonthlyAverage_WhenWholeMonthDiminishingConsumption_ConsumptionIsCorrect()
+        {
+            // Arrange
+            const double v0 = 0;
+            var t0 = new DateTime(2015, 09, 01, 0, 0, 0);
+            var t1 = new DateTime(2015, 09, 16, 0, 0, 0);
+            var t2 = new DateTime(2015, 10, 01, 0, 0, 0);
+            double[] consumptionPerDay = {2d, 1d};
+            
+            var v1 = v0 + consumptionPerDay[0] * (t1 - t0).TotalDays;
+            var v2 = v1 + consumptionPerDay[1] * (t2 - t1).TotalDays;
+            var ts = new Timeseries
+            {
+                new Tvq(t0, v0, Quality.Ok),
+                new Tvq(t1, v1, Quality.Ok),
+                new Tvq(t2, v2, Quality.Ok)
+            };
+
+            // Act
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            var x = averages[0];
+            var expectedValue =
+                (t1 - t0).TotalDays * consumptionPerDay[0] 
+                + (t2 - t1).TotalDays * consumptionPerDay[1];
+            Assert.Equal(expectedValue, x.V, 7);
+        }
+
+        [Fact]
+        public void MonthlyAverage_WhenLastValueIsInNextMonth_ConsumptionIsCorrect()
+        {
+            // Arrange
+            const double v0 = 1000;
+            var t0 = new DateTime(2015, 09, 01, 0, 0, 0);
+            var t1 = new DateTime(2015, 09, 11, 0, 0, 0);
+            var t2 = new DateTime(2015, 10, 02, 0, 0, 0);
+            double[] consumptionPerDay = {2d, 1d};
+            
+            var v1 = v0 + consumptionPerDay[0] * (t1 - t0).TotalDays;
+            var v2 = v1 + consumptionPerDay[1] * (t2 - t1).TotalDays;
+            var ts = new Timeseries
+            {
+                new Tvq(t0, v0, Quality.Ok),
+                new Tvq(t1, v1, Quality.Ok),
+                new Tvq(t2, v2, Quality.Ok)
+            };
+
+            // Act
+            var averages = m_Periodizer.MonthlyAverage(ts);
+
+            //Assert
+            var x = averages[0];
+            var oct1 = new DateTime(2015, 10, 01, 0, 0, 0);
+            var expectedValue0 =
+                (t1 - t0).TotalDays * consumptionPerDay[0] 
+                + (oct1 - t1).TotalDays * consumptionPerDay[1];
+            Assert.Equal(expectedValue0, x.V, 7);
+
+            var nov1 = oct1.AddMonths(1);
+            var expectedValue1 = (nov1 - oct1).TotalDays * consumptionPerDay[1];
+            Assert.Equal(expectedValue1, averages[1].V);
         }
 
         [Fact]
