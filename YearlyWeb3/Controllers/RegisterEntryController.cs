@@ -89,7 +89,7 @@ namespace YearlyWeb3.Controllers
             {
                 var timeseries = TsParser.ParseTimeseries(model.EntriesString);
 
-                var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
+                var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo(User.Identity.Name);
                 foreach (var tvq in timeseries)
                 {
                     repo.AddRegistryEntry(tvq);
@@ -111,9 +111,9 @@ namespace YearlyWeb3.Controllers
         {
             try
             {
-                var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
+                var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo(User.Identity.Name);
 
-                var entries = repo.GetRegistryEntries(Thread.CurrentPrincipal);
+                var entries = repo.GetRegistryEntries();
                 var sortedTvqs = entries.OrderBy(x => x.Time);
                 var tsWithRegisterEntries = new Timeseries();
                 tsWithRegisterEntries.AddRange(sortedTvqs.ToList());
@@ -140,7 +140,7 @@ namespace YearlyWeb3.Controllers
                 return View("ListEntriesView");
             } // TODO better error handling
 
-            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
+            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo(User.Identity.Name);
             ok = repo.DeleteRegistryEntry(t);
             if (!ok)
             {

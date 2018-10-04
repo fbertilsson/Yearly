@@ -1,4 +1,5 @@
 ﻿using System.Web.Mvc;
+using YearlyBackend.Periodic;
 
 namespace YearlyWeb3.Controllers
 {
@@ -9,7 +10,7 @@ namespace YearlyWeb3.Controllers
         {
             try
             {
-                var monthlyAverages = ValuesController.GetMonthlyAverages();
+                var monthlyAverages = ValuesController.GetMonthlyAverages(User.Identity.Name);
                 return View(monthlyAverages);
             }
             catch (TooFewEntriesException tfe)

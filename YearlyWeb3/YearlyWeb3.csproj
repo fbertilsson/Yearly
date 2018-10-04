@@ -296,7 +296,6 @@
     <Compile Include="Controllers\PeriodicController.cs" />
     <Compile Include="Controllers\RegisterEntryController.cs" />
     <Compile Include="Controllers\RegistryEntryRepoFactory.cs" />
-    <Compile Include="Controllers\TooFewEntriesException.cs" />
     <Compile Include="Controllers\UserProfileController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="DataLayer\RegistryEntryRepo.cs" />
@@ -406,6 +405,10 @@
     <ProjectReference Include="..\Periodic\Periodic.csproj">
       <Project>{dd5f9e94-0015-464f-8485-220578d0d0e4}</Project>
       <Name>Periodic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\YearlyBackend\YearlyBackend.csproj">
+      <Project>{5e96a1b3-d408-4873-b281-ebe8642ff441}</Project>
+      <Name>YearlyBackend</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

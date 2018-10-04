@@ -1,0 +1,33 @@
+﻿@using YearlyBackend.RegisterEntry
+@model RegisterEntriesModel
+
+@{
+    Layout = "_Layout";
+}
+<h2>@ViewBag.Title</h2>
+
+<div>
+    <h4>@ViewBag.SubTitle</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.EntriesString)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EntriesString)
+        </dd>
+
+        @*<dt>
+            @Html.DisplayNameFor(model => model.RegisterValue)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RegisterValue)
+        </dd>*@
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Hem", "Index", "Home")
+</p>

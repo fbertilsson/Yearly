@@ -6,11 +6,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading;
 using System.Web.Http;
 using Periodic;
 using Periodic.Algo;
 using Periodic.Ts;
+using YearlyBackend.Periodic;
 
 namespace YearlyWeb3.Controllers
 {
@@ -21,7 +21,7 @@ namespace YearlyWeb3.Controllers
         [HttpGet]
         public HttpResponseMessage MonthlyValues()
         {
-            var monthlyAverages = GetMonthlyAverages(); // Ignoring the registerId parameter for now
+            var monthlyAverages = GetMonthlyAverages(User.Identity.Name); // Ignoring the registerId parameter for now
             var splitPerYear = new Splitter().SplitPerYear(monthlyAverages);
 
             var writer = new StringWriter();
@@ -38,10 +38,10 @@ namespace YearlyWeb3.Controllers
         }
 
 
-        public static Timeseries GetMonthlyAverages()
+        public static Timeseries GetMonthlyAverages(string identityName)
         {
-            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo();
-            var sortedTvqs = repo.GetRegistryEntries(Thread.CurrentPrincipal).OrderBy(x => x.Time);
+            var repo = new RegistryEntryRepoFactory().GetRegistryEntryRepo(identityName);
+            var sortedTvqs = repo.GetRegistryEntries().OrderBy(x => x.Time);
 
             var tsWithRegisterEntries = new Timeseries();
             tsWithRegisterEntries.AddRange(sortedTvqs.ToList());

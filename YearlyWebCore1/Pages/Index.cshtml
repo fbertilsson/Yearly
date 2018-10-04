@@ -1,0 +1,55 @@
+﻿@page
+@model YearlyWebCore1.Pages.IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+@{
+    ViewBag.Title = "Elförbrukning";
+}
+
+<div class="jumbotron">
+    <h1>@ViewBag.Title</h1>
+    <p class="lead">Här kan du registrera en mätarställning</p>
+    <p>
+        <a asp-controller="RegisterEntry"
+           asp-action="RegisterEntryView"
+           role="button"
+           class="btn btn-primary btn-lg">Registrera</a>
+    </p>
+
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h2>Registrera flera mätarställningar</h2>
+        <p>Här kan du registrera flera mätarställningar</p>
+        <p>
+            <a asp-controller="RegisterEntry"
+               asp-action="RegisterEntriesView"
+               role="button"
+               class="btn btn-primary btn-lg">Registrera flera</a>
+        </p>
+    </div>
+
+    <div class="col-md-4">
+        <h2>Jämför</h2>
+        <p>Jämför din förbrukning</p>
+        <p>
+            <a asp-controller="Periodic"
+               asp-action="PeriodicView"
+               role="button"
+               class="btn btn-primary btn-lg">Månatlig olika år</a>
+        </p>
+    </div>
+
+    <div class="col-md-4">
+        <h2>Detaljer</h2>
+        <p>Se alla mätarställningar</p>
+        <p>
+            <a asp-controller="RegisterEntry"
+               asp-action="ListEntriesView"
+               role="button"
+               class="btn btn-primary btn-lg">Detaljer</a>
+        </p>
+    </div>
+</div>

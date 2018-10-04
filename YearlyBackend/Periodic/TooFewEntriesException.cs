@@ -1,10 +1,10 @@
 using System;
 
-namespace YearlyWeb3.Controllers
+namespace YearlyBackend.Periodic
 {
     public class TooFewEntriesException : Exception
     {
-        public int MinEntries { get; private set; }
+        public int MinEntries { get; }
 
         public TooFewEntriesException(int minEntries)
         {

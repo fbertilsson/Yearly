@@ -1,0 +1,62 @@
+﻿@model Periodic.Ts.Timeseries
+
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Månatlig förbrukning";
+}
+
+<h2>Månatlig förbrukning</h2>
+
+<div
+    id="graphdiv" 
+    style="width: 100%; height: 400px; margin-bottom: 2em;"></div>
+
+<table class="table">
+    <tr>
+        <th>Månad</th>
+        <th>Förbrukning</th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Time)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.V)
+        </td>
+    </tr>
+}
+
+</table>
+
+<div>
+    @Html.ActionLink("Tillbaka", "Index", "Home")
+</div>
+
+<script type="text/javascript"
+        src="~/lib/dygraph/dygraph-combined.js"></script>
+
+<script type="text/javascript">
+    g = new Dygraph(
+
+        // containing div
+        document.getElementById("graphdiv"),
+
+        // CSV or path to a CSV file.
+        "/api/periodic/1234/monthly/csv", // passing a dummy registerId for now
+        {
+            highlightSeriesOpts: {
+                strokeWidth: 3,
+                strokeBorderWidth: 1,
+                highlightCircleSize: 5
+            },
+            hideOverlayOnMouseOut: false,
+            xRangePad: 8,
+            legend: 'always',
+            xlabel: 'Månad',
+            ylabel: 'kWh',
+            includeZero: true
+        }
+    );
+</script>
