@@ -6,7 +6,7 @@ namespace Periodic.Algo
     /// <summary>
     /// Calculates a delta series given a series, where each result TVQ is the
     /// difference from the previous TVQ value. For example, calculates
-    /// consumption from register entries.
+    /// deltas from register entries. Handles rollover.
     /// </summary>
     public class DeltaTsOperator : IUnaryTsOperator
     {
@@ -22,21 +22,27 @@ namespace Periodic.Algo
             const string paramNameTs = "ts";
             if (ts == null) throw new ArgumentException("Must be non-null", paramNameTs);
 
-            if (ts.Count < 2) throw new ArgumentException("ts must contain at least two elements", paramNameTs);
+            //if (ts.Count < 2) throw new ArgumentException("ts must contain at least two elements", paramNameTs);
 
             var result = new Timeseries();
 
-            var enumerator = ts.GetEnumerator();
-            enumerator.MoveNext();
-            var previous = enumerator.Current;
-            while (enumerator.MoveNext())
+            using (var enumerator = ts.GetEnumerator())
             {
-                var current = enumerator.Current;
-                var delta = CalculateDelta(current, previous);
-                result.Add(delta);
-                previous = current;
-            }
+                if (!enumerator.MoveNext())
+                {
+                    throw new ArgumentException("ts must contain at least two elements", paramNameTs);
+                }
 
+                var previous = enumerator.Current;
+                result.Add(new Tvq(previous.Time, 0, Quality.Ok)); // trying to indicate that the consumption starts at 0, but that may not work well if algorithms extrapolate backwards
+                while (enumerator.MoveNext())
+                {
+                    var current = enumerator.Current;
+                    var delta = CalculateDelta(current, previous);
+                    result.Add(delta);
+                    previous = current;
+                }
+            }
             return result;
         }
 

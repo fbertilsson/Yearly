@@ -10,6 +10,7 @@ namespace PeriodicTest.Algo
         private DeltaTvqOperator m_Delta;
         private DateTime m_t0;
         private DateTime m_t1;
+        private Tvq m_Tvq0;
         private Tvq m_Tvq5;
         private Tvq m_Tvq7;
         private Tvq m_Tvq11;
@@ -25,6 +26,7 @@ namespace PeriodicTest.Algo
             m_t0 = new DateTime(2015, 01, 01, 0, 0, 0, 0);
             m_t1 = new DateTime(2015, 02, 01, 0, 0, 0, 0);
 
+            m_Tvq0 = new Tvq(m_t0, 0, Quality.Ok);
             m_Tvq6k = new Tvq(m_t0, 611000, Quality.Ok);
             m_Tvq999991 = new Tvq(m_t0, 999991, Quality.Ok);
             m_Tvq5 = new Tvq(m_t0, 5, Quality.Ok);
@@ -82,6 +84,19 @@ namespace PeriodicTest.Algo
             Assert.Equal(-10, result.V);
         }
 
+        [Fact]
+        public void Apply_When6kAnd0_DeltaIs0()
+        {
+            var result = m_Delta.Apply(m_Tvq6k, m_Tvq0);
+            Assert.Equal(0, result.V);
+        }
+
+        [Fact]
+        public void Apply_When1kAnd0_DeltaIs0()
+        {
+            var result = m_Delta.Apply(new Tvq(m_t0, 1e3, Quality.Ok), m_Tvq0);
+            Assert.Equal(0, result.V);
+        }
         
         [Fact]
         public void Apply_WhenBothOk_ResultIsOk()

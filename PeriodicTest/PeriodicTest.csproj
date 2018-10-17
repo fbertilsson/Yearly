@@ -55,6 +55,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algo\AggregateTest.cs" />
     <Compile Include="Algo\AverageTest.cs" />
     <Compile Include="Algo\DeltaTsOperatorTest.cs" />
     <Compile Include="Algo\DeltaTvqOperatorTest.cs" />

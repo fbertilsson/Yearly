@@ -1,4 +1,5 @@
-﻿using Periodic.Ts;
+﻿using System;
+using Periodic.Ts;
 
 namespace Periodic.Algo
 {
@@ -19,12 +20,18 @@ namespace Periodic.Algo
             if (isRollover)
             {
                 v = Rollover - o1.V + o2.V;
-            } else if (v < 0
-                       && o1.V > RolloverThresholdLower
-                       && o2.V < RolloverThresholdLower)
+            } 
+            else if (v < 0
+                     && o1.V > RolloverThresholdLower
+                     && o2.V < RolloverThresholdLower)
             {
                 v = 0;
             }
+            else if (Math.Abs(o2.V) < 1e-9) // The meter value is zero => new meter installed
+            {
+                v = 0; // Assume zero consumption. Requires meter reading just before switch so as not to lose consumption.
+            }
+
 
             var q = Quality.Ok;
 

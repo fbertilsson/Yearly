@@ -16,12 +16,11 @@ namespace Periodic.Algo
             {
                 currentIndex = i;
                 current = ts[currentIndex];
-                if (current.Time > t0)
+                v0 = current.V;
+                if (current.Time >= t0)
                 {
-                    v0 = current.V; // Value at start of period if first tvq.Time > t0
                     break;
                 }
-                v0 = current.V;
             }
 
             Debug.Assert(ts[currentIndex].Time >= t0);
@@ -33,7 +32,7 @@ namespace Periodic.Algo
 
             double area = 0;
 
-            bool tsHasValueWithinPeriod = current.Time <= t1;
+            var tsHasValueWithinPeriod = current.Time <= t1;
             if (!tsHasValueWithinPeriod)
             {
                 double v1 = 0;
@@ -51,34 +50,35 @@ namespace Periodic.Algo
                 area = v0 * dt;
             }
 
-            var previous = current;
-            var valueAtT1 = current.V;      // a hypothesis
-
+            Tvq previous = null;
             for (i++; i < ts.Count; i++)
             {
+                previous = current;
                 current = ts[i];
-                if (current.Time == t1)
+                if (current.Time > t1)
                 {
-                    valueAtT1 = current.V;
-                }
-                else if (current.Time > t1)
-                {
-                    valueAtT1 = Tvq.CalculateValueAt(t1, previous, current).V;
                     break;
                 }
 
                 var dt = (current.Time - previous.Time).TotalSeconds;
-                area += (previous.V + current.V) / 2 * dt;
-                previous = current;
+                var averageValue = (previous.V + current.V) / 2;
+                area += averageValue * dt;
             }
 
             if (current.Time < t1)
             {
-                valueAtT1 = current.V; // Extrapolate current value to end of period
-            }
+                var isStepwise = true;
+                var valueAtT1 = isStepwise
+                    ? current.V                                      // Take current value
+                    : Tvq.CalculateValueAt(t1, previous, current).V; // Extrapolate linearly
 
-            var deltaT = (t1 - previous.Time).TotalSeconds;
-            area += deltaT * (previous.V + valueAtT1) / 2;
+                var deltaT =
+                    (t1 - current.Time)
+                    .TotalSeconds;
+                var averageValue = (current.V + valueAtT1) / 2;
+                var lastArea = averageValue * deltaT;
+                area += lastArea;
+            }
 
             var average = area/(t1 - t0).TotalSeconds;
             return new Tvq(t0, average, Quality.Interpolated);
