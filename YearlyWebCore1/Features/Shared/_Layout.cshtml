@@ -26,15 +26,16 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-page="/Index" class="navbar-brand">Elförbrukning</a>
+                <a href="/" class="navbar-brand">Elförbrukning</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-page="/Index">Home</a></li>
-                    <li><a asp-page="/About">About</a></li>
-                    <li><a asp-page="/Contact">Contact</a></li>
+                    <li><a href="/Index">Hem</a></li>
+                    <li><a href="/About">Om</a></li>
+                    <li><a href="/Contact">Kontakt</a></li>
                 </ul>
-                <partial name="_LoginPartial" />
+                @Html.Partial("_LoginPartial")
+                @* Why did this not work? <partial name="_LoginPartial" />*@
             </div>
         </div>
     </nav>
