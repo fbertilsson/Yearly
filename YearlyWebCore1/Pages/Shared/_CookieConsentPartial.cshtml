@@ -8,27 +8,27 @@
 
 @if (showBanner)
 {
-    <nav id="cookieConsent" class="navbar navbar-default navbar-fixed-top" role="alert">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#cookieConsent .navbar-collapse">
-                    <span class="sr-only">Toggle cookie consent banner</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <span class="navbar-brand"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></span>
-            </div>
-            <div class="collapse navbar-collapse">
-                <p class="navbar-text">
-                    Use this space to summarize your privacy and cookie use policy.
-                </p>
-                <div class="navbar-right">
-                    <a asp-page="/Privacy" class="btn btn-info navbar-btn">Learn More</a>
-                    <button type="button" class="btn btn-default navbar-btn" data-cookie-string="@cookieString">Accept</button>
-                </div>
-            </div>
+    <nav id="cookieConsent" class="navbar navbar-expand navbar-fixed-top navbar-dark bg-dark" role="alert">
+        <button class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#cookieInfo  .navbar-collapse"
+            aria-controls="cookieInfo"
+            aria-expanded="false"
+            aria-label="Toggle cookie consent banner">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+        <div class="collapse navbar-collapse" role="alert" id="cookieInfo">
+            <p class="navbar-text">Det här stället använder kakor.</p>
         </div>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a asp-page="/Privacy" class="btn btn-info navbar-btn">Läs mer</a>
+            </li>
+            <li class="nav-item active">
+                <button type="button" class="ml-3 btn btn-default navbar-btn" data-cookie-string="@cookieString">Godkänn</button>
+            </li>
+        </ul>
     </nav>
     <script>
         (function () {
