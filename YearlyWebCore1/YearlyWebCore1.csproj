@@ -8,6 +8,10 @@
     <ApplicationInsightsAnnotationResourceId>/subscriptions/0c702eda-9c97-4c23-b3e1-4b73725a6595/resourcegroups/fbmetering/providers/microsoft.insights/components/fbmetering</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
