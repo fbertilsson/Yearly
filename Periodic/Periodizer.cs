@@ -113,6 +113,8 @@ namespace Periodic
                     return new DateTime(t.Year + 1, 1, 1, 0, 0, 0, 0);
                 case Interval.Month:
                     return new DateTime(t.Year, t.Month, 1, 0, 0, 0, 0).AddMonths(1);
+                case Interval.Day:
+                    return new DateTime(t.Year, t.Month, t.Day, 0, 0, 0, 0).AddDays(1);
                 default:
                     throw new ArgumentException("Interval not supported", nameof(intervalLength));                    
             }
@@ -145,6 +147,8 @@ namespace Periodic
                 case Interval.Month:
                     var firstInMonth = new DateTime(t0.Year, t0.Month, 1, 0, 0, 0, 0);
                     return firstInMonth.AddMonths(2) <= t1;
+                case Interval.Day:
+                    return (t1 - t0).TotalDays > 1;
                 default:
                     throw new ArgumentException("Interval not supported", nameof(intervalLength));                    
             }
@@ -158,6 +162,8 @@ namespace Periodic
                     return new DateTime(t.Year, 01, 01, 0, 0, 0);
                 case Interval.Month:
                     return new DateTime(t.Year, t.Month, 01, 0, 0, 0);
+                case Interval.Day:
+                    return new DateTime(t.Year, t.Month, t.Day, 0, 0, 0, 0);
                 default:
                     throw new ArgumentException("Interval not supported", nameof(intervalLength));
             }
@@ -173,6 +179,8 @@ namespace Periodic
                     return new DateTime(t.Year, t.Month, 
                         DateTime.DaysInMonth(t.Year, t.Month), 
                         23, 59, 59);
+                case Interval.Day:
+                    return new DateTime(t.Year, t.Month, t.Day, 23, 59, 59);
                 default:
                     throw new ArgumentException("Interval not supported", nameof(intervalLength));
             }
@@ -188,6 +196,11 @@ namespace Periodic
                     return
                         previous.Year != current.Year ||
                         previous.Month != current.Month;                        
+                case Interval.Day:
+                    return
+                        previous.Year != current.Year ||
+                        previous.Month != current.Month ||
+                        previous.Day != current.Day;
                 default:
                     throw new ArgumentException("Interval not supported", nameof(intervalLength));
             }
@@ -211,6 +224,27 @@ namespace Periodic
             var consumptionTs = deltaOperator.Apply(ts);
 
             var result = Periodize(new Average(), consumptionTs, Interval.Month);
+            return result;
+        }
+
+        /// <summary>
+        /// Calculates daily consumption from meter values.
+        /// Handles roll over and meter change.
+        /// </summary>
+        /// <param name="ts">A time series with meter values, possibly with roll over and meter change.</param>
+        /// <returns>
+        /// a time series with one entry per day where the 
+        /// time is the first second of the day
+        /// and the value is the consumption for that day.
+        /// </returns>
+        public Timeseries DailyAverage(Timeseries ts)
+        {
+            if (ts == null || !ts.Any()) return new Timeseries();
+
+            var deltaOperator = new DeltaTsOperator();
+            var consumptionTs = deltaOperator.Apply(ts);
+
+            var result = Periodize(new Average(), consumptionTs, Interval.Day);
             return result;
         }
 

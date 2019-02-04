@@ -44,5 +44,43 @@ namespace Periodic
             return result;
         }
 
+        public IList<Timeseries> SplitPerWeek(Timeseries timeseries)
+        {
+            var result = new List<Timeseries>();
+            if (timeseries.Any())
+            {
+                Tvq previous = null;
+                Timeseries currentTs = null;
+                timeseries.Reverse();
+
+                foreach (var tvq in timeseries)
+                {
+                    if (previous == null)
+                    {
+                        currentTs = new Timeseries {tvq};
+                        result.Add(currentTs);
+                    }
+                    else
+                    {
+                        if ((previous.Time - tvq.Time).TotalDays >= 7)
+                        {
+                            currentTs = new Timeseries();
+                            result.Add(currentTs);
+                        }
+
+                        currentTs.Add(tvq);
+                    }
+
+                    previous = tvq;
+                }
+
+                foreach (var ts in result)
+                {
+                    ts.Reverse();
+                }
+            }
+
+            return result;
+        }
     }
 }

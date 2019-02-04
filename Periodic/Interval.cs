@@ -3,6 +3,7 @@ namespace Periodic
     public enum Interval
     {
         Year,
-        Month
+        Month,
+        Day
     }
 }

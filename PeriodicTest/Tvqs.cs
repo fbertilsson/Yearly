@@ -8,6 +8,7 @@ namespace PeriodicTest
         public Tvq Tvq20150101 { get; set; }
         public Tvq Tvq20150105 { get; set; }
         public Tvq Tvq20150110 { get; set; }
+        public Tvq Tvq20150120 { get; set; }
         public Tvq Tvq20150131 { get; set; }
         public Tvq Tvq20150301 { get; set; }
         public Tvq Tvq20150601 { get; set; }
@@ -28,9 +29,11 @@ namespace PeriodicTest
             t = new DateTime(2015, 01, 05, 0, 0, 0, 0);
             Tvq20150105 = new Tvq(t, 105, Quality.Ok);
             t = new DateTime(2015, 01, 10, 0, 0, 0, 0);
-            Tvq20150110 = new Tvq(t, 105, Quality.Ok);
+            Tvq20150110 = new Tvq(t, 109, Quality.Ok);
+            t = new DateTime(2015, 01, 20, 0, 0, 0, 0);
+            Tvq20150120 = new Tvq(t, 125, Quality.Ok);
             t = new DateTime(2015, 01, 31, 23, 59, 59);
-            Tvq20150131 = new Tvq(t, 105, Quality.Ok);
+            Tvq20150131 = new Tvq(t, 135, Quality.Ok);
             t = new DateTime(2015, 03, 01, 0, 0, 0, 0);
             Tvq20150301 = new Tvq(t, 110, Quality.Ok);
             t = new DateTime(2015, 06, 01, 0, 0, 0, 0);

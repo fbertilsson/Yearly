@@ -53,5 +53,24 @@ namespace YearlyWebCore1.Features.Periodic
             
             return Content(result, "text/csv");
         }
+
+        
+        [Route("api/periodic/{registerId}/daily/csv")]
+        [HttpGet]
+        public async Task<ContentResult> DailyValues()
+        {
+            var command = new GetDailyByWeekQuery(User.Identity.Name); // Ignoring the registerId parameter for now
+            var dailyAverages = await _mediator.Send(command);
+
+            var splitPerWeek = new Splitter().SplitPerWeek(dailyAverages);
+
+            var writer = new StringWriter();
+            var renderer = new DailyValueTextRenderer(CultureInfo.InvariantCulture);
+            renderer.Render(splitPerWeek, writer);
+            
+            var result = writer.ToString();
+            
+            return Content(result, "text/csv");
+        }
     }
 }
