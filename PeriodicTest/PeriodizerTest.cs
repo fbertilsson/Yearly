@@ -50,7 +50,7 @@ namespace PeriodicTest
         [Fact]
         public void InsertPoints_WhenEmptyTs_ReturnsEmptyTs()
         {
-            Assert.Equal(0, m_Periodizer.InsertPoints(new Timeseries(), Interval.Year).Count);
+            Assert.Empty(m_Periodizer.InsertPoints(new Timeseries(), Interval.Year));
         }
 
         [Fact]
