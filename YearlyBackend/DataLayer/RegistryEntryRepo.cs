@@ -1,24 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Security.Principal;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
+using Azure;
+using Azure.Data.Tables;
 using Periodic.Ts;
 
 namespace YearlyBackend.DataLayer
 {
     public class RegistryEntryRepo
     {
-        private readonly CloudStorageAccount m_StorageAccount;
-        private readonly string m_PartitionKey;
+        private const string TableName = "registryentries";
 
-        public RegistryEntryRepo(CloudStorageAccount storageAccount, string partitionKey)
+        private readonly TableServiceClient m_StorageAccount;
+        private readonly string m_PartitionKey;
+        private TableClient m_TableClient;
+
+        public RegistryEntryRepo(TableServiceClient storageAccount, string partitionKey)
         {
             m_StorageAccount = storageAccount;
             m_PartitionKey = EnforceNamingRules(partitionKey);
+            m_TableClient = m_StorageAccount.GetTableClient(TableName);
         }
 
         /// <summary>
@@ -37,39 +39,33 @@ namespace YearlyBackend.DataLayer
 
         public async Task AddRegistryEntries(IEnumerable<Tvq> tvqs)
         {
-            // Create the table client.
-            var tableClient = m_StorageAccount.CreateCloudTableClient();
-
             // Create the table if it doesn't exist.
-            var table = tableClient.GetTableReference("registryentries");
-            await table.CreateIfNotExistsAsync();
-
+            var table = await m_StorageAccount.CreateTableIfNotExistsAsync(TableName);
+            
             foreach (var tvq in tvqs)
             {
                 var tvqEntity = new TvqEntity(m_PartitionKey, tvq);
-                var insertOperation = TableOperation.Insert(tvqEntity);
 
                 // Execute the insert operation.
-                await table.ExecuteAsync(insertOperation);
+                await m_TableClient.AddEntityAsync(tvqEntity);
             }
         }
 
         public async Task<IEnumerable<Tvq>> GetRegistryEntries()
         {
-            // Create the table client.
-            var tableClient = m_StorageAccount.CreateCloudTableClient();
-
             // Create the table if it doesn't exist.
-            var table = tableClient.GetTableReference("registryentries");
-            await table.CreateIfNotExistsAsync();
+            await m_StorageAccount.CreateTableIfNotExistsAsync(TableName);
 
             // Construct the query operation for all entities where PartitionKey limits the search.
-            var query = new TableQuery<TvqEntity>()
-                .Where(TableQuery.GenerateFilterCondition(
-                    "PartitionKey", QueryComparisons.Equal, m_PartitionKey));
-
-            var result = await table.ExecuteQueryAsync(query);
-            return result.Select(x => x.ToTvq());
+            var queryAsync = m_TableClient.QueryAsync<TvqEntity>(
+                tvq => tvq.PartitionKey == m_PartitionKey);
+            
+            var result = new List<Tvq>();
+            await foreach (var page in queryAsync.AsPages())
+            {
+                result.AddRange(page.Values.Select(value => value.ToTvq()));
+            }
+            return result;
         }
 
         /// <summary>
@@ -79,20 +75,15 @@ namespace YearlyBackend.DataLayer
         /// <returns>True if successful</returns>
         public async Task<bool> DeleteRegistryEntry(DateTime t)
         {
-            // Create the table client.
-            var tableClient = m_StorageAccount.CreateCloudTableClient();
-
             // Create the table if it doesn't exist.
-            var table = tableClient.GetTableReference("registryentries");
-            await table.CreateIfNotExistsAsync();
+            await m_StorageAccount.CreateTableIfNotExistsAsync(TableName);
 
             var entity = new TvqEntity(m_PartitionKey, new Tvq(t, 0, Quality.Ok))
             {
-                ETag = "*"
+                ETag = ETag.All
             };
-            var deleteOperation = TableOperation.Delete(entity);
-            var result = await table.ExecuteAsync(deleteOperation);
-            var ok = result.HttpStatusCode == (int) HttpStatusCode.NoContent;
+            var result = await m_TableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
+            var ok = ! result.IsError; // TODO handle error
             return ok;
         }
     }

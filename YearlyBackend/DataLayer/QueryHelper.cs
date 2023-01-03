@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage.Table;
 
 namespace YearlyBackend.DataLayer
 {
+    // TODO Delete
     public static class StorageQueryHelper 
     {
         /// <summary>
@@ -17,26 +17,26 @@ namespace YearlyBackend.DataLayer
         /// <param name="ct"></param>
         /// <param name="onProgress"></param>
         /// <returns></returns>
-        public static async Task<IList<T>> ExecuteQueryAsync<T>(
-            this CloudTable table, 
-            TableQuery<T> query, 
-            CancellationToken ct = default(CancellationToken), 
-            Action<IList<T>> onProgress = null) 
-            where T : ITableEntity, new()
-        {
-            var items = new List<T>();
-            TableContinuationToken token = null;
+        //public static async Task<IList<T>> ExecuteQueryAsync<T>(
+        //    this CloudTable table, 
+        //    TableQuery<T> query, 
+        //    CancellationToken ct = default(CancellationToken), 
+        //    Action<IList<T>> onProgress = null) 
+        //    where T : ITableEntity, new()
+        //{
+        //    var items = new List<T>();
+        //    TableContinuationToken token = null;
 
-            do
-            {
-                var seg = await table.ExecuteQuerySegmentedAsync(query, token);
-                token = seg.ContinuationToken;
-                items.AddRange(seg);
-                onProgress?.Invoke(items);
+        //    do
+        //    {
+        //        var seg = await table.ExecuteQuerySegmentedAsync(query, token);
+        //        token = seg.ContinuationToken;
+        //        items.AddRange(seg);
+        //        onProgress?.Invoke(items);
 
-            } while (token != null && !ct.IsCancellationRequested);
+        //    } while (token != null && !ct.IsCancellationRequested);
 
-            return items;
-        }
+        //    return items;
+        //}
     }
 }

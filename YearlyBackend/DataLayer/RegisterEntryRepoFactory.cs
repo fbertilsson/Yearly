@@ -1,4 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage;
+﻿using Azure.Data.Tables;
 
 namespace YearlyBackend.DataLayer
 {
@@ -13,9 +13,9 @@ namespace YearlyBackend.DataLayer
 
         public RegistryEntryRepo GetRegistryEntryRepo(string partitionKey)
         {
-            var storageAccount = CloudStorageAccount.Parse(_connectionString);
+            var tableServiceClient = new TableServiceClient(_connectionString);
 
-            var repo = new RegistryEntryRepo(storageAccount, partitionKey);
+            var repo = new RegistryEntryRepo(tableServiceClient, partitionKey);
             return repo;
         }
     }

@@ -1,11 +1,17 @@
 ﻿using System;
-using Microsoft.WindowsAzure.Storage.Table;
+using Azure;
+using Azure.Data.Tables;
 using Periodic.Ts;
 
 namespace YearlyBackend.DataLayer
 {
-    public class TvqEntity : TableEntity
+    public class TvqEntity : ITableEntity
     {
+        public string PartitionKey { get; set; }
+        public string RowKey { get; set; }
+        public DateTimeOffset? Timestamp { get; set; }
+        public ETag ETag { get; set; }
+
         public TvqEntity(string partitionKey, Tvq tvq)
         {
             PartitionKey = partitionKey;
@@ -29,5 +35,6 @@ namespace YearlyBackend.DataLayer
         {
             return new Tvq(T, V, Q);
         }
+
     }
 }
